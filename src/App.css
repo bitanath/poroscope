@@ -1,42 +1,46 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+body {
+  background-color: black !important;
+  margin: 0;
+  padding: 0;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+[data-amplify-authenticator] {
+  --amplify-components-authenticator-router-background-color: rgba(255, 255, 255, 0.8);
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  min-height: 100vh !important;
+  opacity: 1 !important;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+[data-amplify-router] {
+  opacity: 0.8;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+[data-amplify-authenticator] button[type="submit"] {
+  background-color: #047d95 !important;
+  opacity: 1.25 !important;
 }
 
-.card {
-  padding: 2em;
+[data-amplify-authenticator] .amplify-card,
+[data-amplify-authenticator] [data-amplify-router] {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
-.read-the-docs {
-  color: #888;
+/* Remove blue focus outline on authenticator tabs */
+[data-amplify-authenticator] [data-amplify-router] button,
+[data-amplify-authenticator] [data-amplify-router] button:focus,
+[data-amplify-authenticator] [data-amplify-router] button:active,
+[data-amplify-authenticator] [data-amplify-router] button:hover {
+  outline: none !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+}
+
+[data-amplify-authenticator] [data-amplify-router] button:hover::after,
+[data-amplify-authenticator] [data-amplify-router] button:focus::after,
+[data-amplify-authenticator] [data-amplify-router] button::after {
+  display: none !important;
 }
