@@ -1,5 +1,6 @@
 import { MultiStepLoader as Loader } from "../ui/multi-step-loader";
 import { XCircle } from "lucide-react";
+import { useEffect } from "react";
 
 interface LoadingProps {
   loadingStates: { text: string }[];
@@ -9,6 +10,11 @@ interface LoadingProps {
 }
 
 export function Loading({ loadingStates, loading, onStart, onStop }: LoadingProps) {
+  useEffect(() => {
+    onStart?.();
+    console.log("Loading Started")
+  }, []);
+
   return (
     <>
       <Loader loadingStates={loadingStates} loading={loading} duration={2000} />

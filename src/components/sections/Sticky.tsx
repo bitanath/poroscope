@@ -6,7 +6,7 @@ import { Card } from './Card';
 import ClashCard from './ClashCard';
 import { animate, scroll } from 'motion';
 import TextAnimation from '@/components/ui/scroll-text';
-import SmoothScroll from './SmoothScroll';
+import HorizontalScroller from './Horizontal';
 
 
 export default function Sticky(): JSX.Element {
@@ -99,7 +99,7 @@ export default function Sticky(): JSX.Element {
             
         </div>
         <div className="wrapper">
-            <SmoothScroll></SmoothScroll>
+            <HorizontalScroller></HorizontalScroller>
         </div>
 
         <section className='text-white w-full bg-slate-950'>

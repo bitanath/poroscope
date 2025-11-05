@@ -7,7 +7,6 @@ import React, {
 } from "react";
 import {
   motion,
-  useScroll,
   useTransform,
   useSpring,
   useMotionValue,
@@ -55,7 +54,7 @@ const useScrollPercentage = ({ threshold = 0.1 }: UseScrollPercentageOptions = {
   return [ref, percentage];
 };
 
-const SmoothScroll: React.FC = () => {
+const HorizontalScroller: React.FC = () => {
   const scrollRef = useRef<HTMLElement>(null);
   const ghostRef = useRef<HTMLDivElement>(null);
   const [scrollRange, setScrollRange] = useState<number>(0);
@@ -126,4 +125,4 @@ const SmoothScroll: React.FC = () => {
   );
 };
 
-export default SmoothScroll;
+export default HorizontalScroller;

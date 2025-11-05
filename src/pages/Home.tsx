@@ -74,11 +74,25 @@ export default function Home({ signOut }: HomeProps) {
         onStart={() => setLoading(true)}
         onStop={() => setLoading(false)}
       />
-      
+      <div className="max-w-screen w-screen bg-black">
+        <LightBoard
+          rows={25}
+          lightSize={4}
+          gap={1}
+          text="Colors of the Rainbow"
+          font="default"
+          updateInterval={200}
+          colors={{
+            background: "#1a1a1a",
+            textDim: "#ff9999",
+            drawLine: "#ffff99",
+            textBright: "#99ffff",
+          }}
+        />
+      </div>
       <Sticky></Sticky>
-      {/* <HorizontalScroll></HorizontalScroll> */}
       <VStack><Spacer size="20"></Spacer></VStack>
-      
+      <button style={{display:"none"}} onClick={signOut}></button>
       <FloatingDockDemo/>
     </div>
   );

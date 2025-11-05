@@ -32,6 +32,7 @@ export default function Dashboard({ signOut, user }: DashboardProps) {
       <h1>Dashboard</h1>
       <div>
         <h2>User Information</h2>
+        <p><strong>User:</strong> {user.attributes?.email}</p>
         <p><strong>Email:</strong> {userAttributes.email}</p>
         <p><strong>Riot ID:</strong> {userAttributes.riotId}</p>
         <p><strong>Region:</strong> {userAttributes.region}</p>
