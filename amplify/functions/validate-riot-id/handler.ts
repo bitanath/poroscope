@@ -22,7 +22,7 @@ export const handler: Schema["validateRiotId"]["functionHandler"] = async (event
         }
       }
     );
-    console.log(response.status)
+    console.log(response.headers)
     console.log(response.statusText)
     return {
       valid: response.ok,
