@@ -1,4 +1,4 @@
-import ThreeBackground from './components/sections/ThreeBackground';
+import Background from './components/sections/Background';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 
@@ -51,7 +51,7 @@ export default function App() {
         initialState="signIn"
         components={{
           Header() {
-            return <ThreeBackground />;
+            return <Background />;
           },
           SignUp: {
             FormFields() {
@@ -131,6 +131,7 @@ export default function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Home signOut={signOut!} />} />
+              <Route path="/home" element={<Home signOut={signOut!} />} />
               <Route path="/dashboard" element={<Dashboard signOut={signOut!} user={user!} />} />
               <Route path="/ssr" element={<Home signOut={signOut!} />} />
             </Routes>

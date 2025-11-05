@@ -1,23 +1,16 @@
-import { Loading } from "@/components/sections/Loader";
 import { useState } from "react";
+import { Loading } from "@/components/sections/Loader";
 import {VStack,Spacer} from "@/components/sections/Stacks"
 
-import { LightBoard } from "@/components/ui/lightboard";
+import { FloatingDock } from "@/components/ui/floating-dock";
+import { IconBrandGithub, IconShare, IconSettings2, IconDownload } from "@tabler/icons-react"; import Sticky from "@/components/sections/Sticky";
 
-const loadingStates = [ { text: "Buying a condo", }, { text: "Travelling in a flight", }, { text: "Meeting Tyler Durden", }, { text: "He makes soap", }, { text: "We goto a bar", }, { text: "Start a fight", }, { text: "We like it", }, { text: "Welcome to F**** C***", }]
+const loadingStates = [ { text: "Fetching Summoner Profile", }, { text: "Fetching Matches", }, { text: "Understanding Match Data", }, { text: "Understanding Champion Statistics", }, { text: "Identifying Competitive Insights", }, { text: "Preparing Report", }, { text: "Ready to Go!", }]
 
 interface HomeProps {
   signOut: () => void;
 }
 
-import { FloatingDock } from "@/components/ui/floating-dock";
-import {
-  IconBrandGithub,
-  IconShare,
-  IconSettings2,
-  IconDownload
-} from "@tabler/icons-react";
-import Sticky from "@/components/sections/Sticky";
 
 export function FloatingDockDemo() {
   const links = [
@@ -26,7 +19,7 @@ export function FloatingDockDemo() {
       icon: (
         <IconBrandGithub className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
-      href: "#",
+      href: "https://github.com/bitanath/poroscope",
     },
     {
       
@@ -34,14 +27,14 @@ export function FloatingDockDemo() {
       icon: (
         <IconSettings2 className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
-      href: "#",
+      href: "/dashboard",
     },
     {
       title: "Share",
       icon: (
         <IconShare className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
-      href: "#",
+      href: "/dashboard",
     },
 
     {
@@ -53,7 +46,7 @@ export function FloatingDockDemo() {
     }
   ];
   return (
-    <div className="fixed bottom-16 left-1/2 transform -translate-x-1/2 z-50">
+    <div className="fixed bottom-16 left-1/2 transform -translate-x-1/2 z-50 opacity-60">
       <FloatingDock
         mobileClassName="fixed transform -translate-x-[48vw]!"
         items={links}
@@ -74,22 +67,7 @@ export default function Home({ signOut }: HomeProps) {
         onStart={() => setLoading(true)}
         onStop={() => setLoading(false)}
       />
-      <div className="max-w-screen w-screen bg-black">
-        <LightBoard
-          rows={25}
-          lightSize={4}
-          gap={1}
-          text="Colors of the Rainbow"
-          font="default"
-          updateInterval={200}
-          colors={{
-            background: "#1a1a1a",
-            textDim: "#ff9999",
-            drawLine: "#ffff99",
-            textBright: "#99ffff",
-          }}
-        />
-      </div>
+      
       <Sticky></Sticky>
       <VStack><Spacer size="20"></Spacer></VStack>
       <button style={{display:"none"}} onClick={signOut}></button>

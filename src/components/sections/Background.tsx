@@ -18,8 +18,13 @@ void main() {
   vec2 uv = gl_FragCoord.xy / resolution.xy;
   uv.y = 1.0 - uv.y;
   
-  // Oversized image - scale UV from center
-  uv = (uv - 0.5) * 0.9 + 0.5;
+  // Mobile overflow: scale less on narrow screens to crop instead of squeeze
+  float scale = resolution.x < 768.0 ? 0.7 : 0.9;
+  if (resolution.x < 480.0 && resolution.x / resolution.y < 1.0) {
+    scale = 0.6;
+  }
+  
+  uv = (uv - 0.5) * scale + 0.5;
   
   // Blur depth map for smoother displacement
   vec2 texelSize = 1.0 / resolution;
@@ -30,7 +35,9 @@ void main() {
   depth += texture2D(depthImage, uv + vec2(0.0, -texelSize.y));
   depth /= 10.0;
   
-  gl_FragColor = texture2D(originalImage, uv + mouse * depth.r * 0.1);
+  // Keep same depth effect strength
+  float depthStrength = resolution.x < 768.0 ? 0.15 : 0.1;
+  gl_FragColor = texture2D(originalImage, uv + mouse * depth.r * depthStrength);
 }
 `;
 
@@ -70,7 +77,7 @@ class Rect {
   }
 }
 
-export default function ThreeBackground() {
+export default function Background({opacity}:{opacity?:number|undefined;}) {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -152,18 +159,26 @@ export default function ThreeBackground() {
       render();
     });
 
-    const resize = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      
-      canvas.width = width * ratio;
-      canvas.height = height * ratio;
-      canvas.style.width = '100vw';
-      canvas.style.height = '100vh';
-      
-      uResolution.set(width, height);
-      gl.viewport(0, 0, width * ratio, height * ratio);
-    };
+  const resize = () => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    
+    canvas.width = width * ratio;
+    canvas.height = height * ratio;
+    canvas.style.width = '100vw';
+    canvas.style.height = '100vh';
+    
+    // Mobile: use object-fit cover behavior
+    if (width < 480) {
+      canvas.style.objectFit = 'fill';
+      canvas.style.objectPosition = 'center';
+    } else {
+      canvas.style.objectFit = 'fill';
+    }
+    
+    uResolution.set(width, height);
+    gl.viewport(0, 0, width * ratio, height * ratio);
+  };
 
     const render = () => {
       mouseX += (mouseTargetX - mouseX) * 0.02;
@@ -221,6 +236,7 @@ export default function ThreeBackground() {
         left: 0,
         width: '100%',
         height: '100%',
+        opacity: opacity||0.56,
         zIndex: -1,
       }}
     />

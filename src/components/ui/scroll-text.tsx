@@ -86,7 +86,7 @@ const TextAnimation = ({
       variants={containerVariants}
       viewport={viewport}
       className={cn(
-        `inline-block dark:text-white text-black uppercase`,
+        `inline-block dark:text-white text-black`,
         classname
       )}
     >

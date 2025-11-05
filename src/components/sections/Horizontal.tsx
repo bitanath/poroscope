@@ -1,17 +1,7 @@
-import React, {
-  useRef,
-  useState,
-  useLayoutEffect,
-  useCallback,
-  useEffect
-} from "react";
-import {
-  motion,
-  useTransform,
-  useSpring,
-  useMotionValue,
-  MotionValue
-} from "motion/react";
+import React, { useRef, useState, useLayoutEffect, useCallback, useEffect } from "react";
+import { motion, useTransform, useSpring, useMotionValue, MotionValue } from "motion/react";
+
+import StatsCard from "../ui/stats";
 
 interface UseScrollPercentageOptions {
   threshold?: number;
@@ -87,8 +77,7 @@ const HorizontalScroller: React.FC = () => {
   });
 
   useEffect(() => {
-    console.log("Scroll percentage",percentage)
-    scrollPerc.set(percentage * 1.4);
+    scrollPerc.set(percentage * 1.25);
   }, [percentage, scrollPerc]);
 
   const transform = useTransform(
@@ -101,21 +90,82 @@ const HorizontalScroller: React.FC = () => {
 
   return (
     <div ref={containerRef} className="relative">
-      <div className="sticky top-0 h-screen flex items-center overflow-hidden">
+      <div className="sticky bg-slate-950 top-0 h-screen flex items-center overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-size-[54px_54px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
         <motion.section
           ref={scrollRef}
           style={{ x: spring }}
-          className="flex"
+          className="flex relative z-10"
         >
           <div className="flex gap-4">
-            <div className="w-240 h-120 bg-neutral shrink-0 rounded-lg" />
-            <div className="w-240 h-120 bg-red-400 shrink-0 rounded-lg" />
-            <div className="w-240 h-120 bg-blue-400 shrink-0 rounded-lg" />
-            <div className="w-240 h-120 bg-green-400 shrink-0 rounded-lg" />
-            <div className="w-240 h-120 bg-yellow-400 shrink-0 rounded-lg" />
-            <div className="w-240 h-120 bg-purple-400 shrink-0 rounded-lg" />
-            <div className="w-240 h-120 bg-pink-400 shrink-0 rounded-lg" />
-            <div className="w-240 h-120 bg-neutral shrink-0 rounded-lg" />
+            <div className="w-120 h-60 sm:w-240 sm:h-120 bg-neutral shrink-0 rounded-lg" />
+            <div className="w-120 h-60 sm:w-240 sm:h-120 bg-neutral shrink-0 rounded-lg" />
+            <StatsCard 
+              title="KDA - MVP" 
+              value={"793"} 
+              delta={0.2} 
+              average={"781"} 
+              footer="Average Teammates KDA"
+              variant="blue"
+            />
+            <StatsCard 
+              title="KDA - Comparison" 
+              value={"393"} 
+              delta={0.2} 
+              average={"211"} 
+              footer="Average Opponents KDA"
+              variant="purple"
+            />
+
+            <StatsCard 
+              title="Earned GPM" 
+              value={"593"} 
+              delta={0.2} 
+              average={"481"} 
+              footer="Average Opponent GPM"
+              variant="teal"
+            />
+            <StatsCard 
+              title="GSPD" 
+              value={"793"} 
+              delta={0.2} 
+              average={"781"} 
+              footer="Average Opponent GSPD"
+              variant="light"
+            />
+            <StatsCard 
+              title="CSPM" 
+              value={"793"} 
+              delta={0.2} 
+              average={"781"} 
+              footer="Average Opponent CSPM"
+              variant="purple"
+            />
+            <StatsCard 
+              title="XPDiffAt15" 
+              value={"121211"} 
+              delta={0.2} 
+              average={"111445"} 
+              footer="Average Teammate XP Diff"
+              variant="teal"
+            />
+            <StatsCard 
+              title="CSDiffAt15" 
+              value={"2312312"} 
+              delta={0.2} 
+              average={"2223123"} 
+              footer="Average Teammate CS Diff"
+              variant="blue"
+            />
+            <StatsCard 
+              title="Dragons and Drakes" 
+              value={"21"} 
+              delta={0.2} 
+              average={"11"} 
+              footer="Average Opponent Dragons and Drakes"
+              variant="light"
+            />
+            <div className="w-120 h-60 sm:w-240 sm:h-120 bg-neutral shrink-0 rounded-lg" />
           </div>
         </motion.section>
       </div>
