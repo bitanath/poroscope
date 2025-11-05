@@ -13,7 +13,7 @@ import HorizontalScroller from './Horizontal';
 export default function Sticky(): JSX.Element {
     const container = useRef(null);
     const [activeCardIndex, setActiveCardIndex] = useState(0);
-    const [kda,setKda] = useState({kills:1000,deaths:100,assists:10})
+    const [kda,_] = useState({kills:1000,deaths:100,assists:10})
 
   return (
     <ReactLenis root>
