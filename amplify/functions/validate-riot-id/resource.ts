@@ -6,6 +6,6 @@ export const validateRiotId = defineFunction({
   timeoutSeconds: 60,
   environment: {
     NAME: "Validate Riot Id",
-    API_KEY: secret('RIOT_API_KEY')
+    API_KEY: secret('VALKYRIE_RIOT_API_KEY')
   }
 });
