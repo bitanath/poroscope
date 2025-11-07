@@ -3,6 +3,7 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineFunction } from "@aws-amplify/backend";
 import { DockerImage, Duration } from "aws-cdk-lib";
+import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { Code, Function, Runtime } from "aws-cdk-lib/aws-lambda";
 
 const functionDir = path.dirname(fileURLToPath(import.meta.url));
@@ -10,6 +11,12 @@ const functionDir = path.dirname(fileURLToPath(import.meta.url));
 export const summonerFetcher = defineFunction(
   (scope) => {
     return new Function(scope, "summoner-fetcher", {
+      initialPolicy: [
+        new PolicyStatement({
+          actions: ['ssm:GetParameter', 'ssm:GetParameters'],
+          resources: ['arn:aws:ssm:*:*:parameter/amplify/*']
+        })
+      ],
       handler: "handler.handler",
       runtime: Runtime.PYTHON_3_10,
       timeout: Duration.seconds(900),

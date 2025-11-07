@@ -14,7 +14,7 @@ def get_secret(secret_name):
     return response['Parameter']['Value']
 
 def fetch_summoner(fullName):
-    api_key = get_secret('API_KEY_VALKYRIE')
+    api_key = get_secret('VALKYRIE_RIOT_API_KEY')
     headers = {
         "X-Riot-Token": api_key
     }
