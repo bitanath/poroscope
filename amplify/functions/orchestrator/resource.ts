@@ -13,8 +13,12 @@ export const orchestrator = defineFunction(
     return new Function(scope, "orchestrator", {
       initialPolicy: [
         new PolicyStatement({
-          actions: ['ssm:GetParameter', 'ssm:GetParameters', 'lambda:InvokeFunction'],
-          resources: ['arn:aws:ssm:*:*:parameter/amplify/*','arn:aws:lambda:*:*:function:match-fetcher','arn:aws:lambda:*:*:function:summoner-fetcher',]
+          actions: ['ssm:GetParameter', 'ssm:GetParameters'],
+          resources: ['arn:aws:ssm:*:*:parameter/amplify/*']
+        }),
+        new PolicyStatement({
+          actions: ['lambda:InvokeFunction'],
+          resources: ['arn:aws:lambda:*:*:function:amplify-*']
         })
       ],
       handler: "handler.handler",
