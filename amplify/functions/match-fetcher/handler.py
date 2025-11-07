@@ -83,7 +83,6 @@ def fetch_match_detail(match_id,api_keys):
     response = requests.get(f"https://americas.api.riotgames.com/lol/match/v5/matches/{match_id}", headers=headers)
     
     if response.status_code == 200:
-        logger.info("Got match " + match_id)
         match = response.json()
         match = del_metadata(match)
         return match
@@ -127,11 +126,14 @@ def handler(event, context):
         logger.info(f"Got {len(match_ids)} matches played")
         match_details = get_all_match_details(match_ids)
         logger.info(f"Got {len(match_details)} matches details for all")
+        response_json = json.dumps(match_details)
+        size_mb = len(response_json.encode('utf-8')) / (1024 * 1024)
         return {
             'statusCode': 200,
             'body': json.dumps({
                 'match_count': len(match_details),
-                'matches': match_details
+                'message': f'Processed {len(match_details)} matches successfully',
+                'size_mb': size_mb
             })
         }
         
