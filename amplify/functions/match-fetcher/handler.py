@@ -53,6 +53,28 @@ def get_all_matches_played(puuid, headers):
             page += 4
     return all_matches
 
+def del_metadata(match):
+    if match.get('metadata'):
+            del match['metadata']
+        
+    for p in match['info']['participants']:
+        del p['PlayerScore0']
+        del p['PlayerScore1']
+        del p['PlayerScore10']
+        del p['PlayerScore11']
+        del p['PlayerScore2']
+        del p['PlayerScore3']
+        del p['PlayerScore4']
+        del p['PlayerScore5']
+        del p['PlayerScore6']
+        del p['PlayerScore7']
+        del p['PlayerScore8']
+        del p['PlayerScore9']
+        del p['challenges']
+        del p['perks']
+        del p['missions']
+    return match
+
 def fetch_match_detail(match_id,api_keys):
     headers = {
         "X-Riot-Token": random.choice(api_keys)
@@ -62,7 +84,9 @@ def fetch_match_detail(match_id,api_keys):
     
     if response.status_code == 200:
         logger.info("Got match " + match_id)
-        return response.json()
+        match = response.json()
+        match = del_metadata(match)
+        return match
     elif response.status_code == 429:
         retry_after = min(int(response.headers.get('Retry-After', 1)), 5)
         time.sleep(retry_after)
@@ -71,7 +95,7 @@ def fetch_match_detail(match_id,api_keys):
         }
     
         response = requests.get(f"https://americas.api.riotgames.com/lol/match/v5/matches/{match_id}", headers=headers)
-        return response.json() if response.status_code == 200 else None
+        return del_metadata(response.json()) if response.status_code == 200 else None
     
     return None
 
