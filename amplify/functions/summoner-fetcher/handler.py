@@ -13,92 +13,46 @@ def get_secret(secret_name):
     response = client.get_parameter(Name=parameter_name, WithDecryption=True)
     return response['Parameter']['Value']
 
-def fetch_page(page, puuid, headers):
-    specific_datetime = datetime.datetime(2025, 1, 1, 1, 1, 1)
-    epoch_start = int(specific_datetime.timestamp())
-    specific_datetime = datetime.datetime(2026, 1, 1, 1, 1, 1)
-    epoch_end = int(specific_datetime.timestamp())
-    start = page * 100
-    response = requests.get(
-        f"https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start={start}&count=100&startTime={epoch_start}&endTime={epoch_end}",
-        headers=headers
-    )
-    return response.json()
-
-def get_all_matches_played(puuid, headers):
-    all_matches = []
-    page = 0
-    with ThreadPoolExecutor(max_workers=4) as executor:
-        while True:
-            futures = []
-            for i in range(4):
-                futures.append(executor.submit(fetch_page, page + i, puuid, headers))
-            
-            results = [future.result() for future in futures]
-            
-            if any(not result for result in results):
-                for result in results:
-                    if result:
-                        all_matches.extend(result)
-                break
-            
-            for result in results:
-                all_matches.extend(result)
-            
-            page += 4
-    return all_matches
-
-def fetch_match_detail(match_id):
-    api_keys = [get_secret('API_KEY_DISABLOT'), get_secret('API_KEY_VALKYRIE'), get_secret('API_KEY_RIGSTHULA'), get_secret('API_KEY_RAGNAROK')]
+def fetch_summoner(fullName):
+    api_key = get_secret('API_KEY_VALKYRIE')
     headers = {
-        "X-Riot-Token": random.choice(api_keys)
+        "X-Riot-Token": api_key
     }
-    
-    response = requests.get(f"https://americas.api.riotgames.com/lol/match/v5/matches/{match_id}", headers=headers)
-    
-    if response.status_code == 200:
-        return response.json()
-    elif response.status_code == 429:
-        retry_after = min(int(response.headers.get('Retry-After', 1)), 5)
-        time.sleep(retry_after)
-        
-        response = requests.get(f"https://americas.api.riotgames.com/lol/match/v5/matches/{match_id}", headers=headers)
-        return response.json() if response.status_code == 200 else None
-    
-    return None
+    [game_name,tag_line] = fullName.split("#")
+    url = f"https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{game_name}/{tag_line}"
+    response = requests.get(url, headers=headers)
+    if(response.status_code != 200): raise Exception(f"Unable to fetch riot id by {game_name} and #{tag_line}")
+    player_dict = response.json()
+    puuid = player_dict['puuid']
 
-def get_all_match_details(match_ids):
-    all_details = []
-    
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        futures = [executor.submit(fetch_match_detail, match_id) for match_id in match_ids]
-        all_details = [future.result() for future in futures if future.result()]
-    
-    return all_details
+    url = f"https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}"
+    response = requests.get(url, headers=headers)
+    summoner_dict = response.json()
+    profileIconId = summoner_dict['profileIconId']
+    summonerLevel = summoner_dict['summonerLevel']
+
+    if(summonerLevel < 1): raise Exception(f"Level too low: {game_name} and #{tag_line}")
+
+    versions = requests.get("https://ddragon.leagueoflegends.com/api/versions.json").json()
+    latest_version = versions[0]
+    profile_icon_url = f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/img/profileicon/{profileIconId}.png"
+    summoner_dict['name'] = game_name
+    summoner_dict['tag'] = tag_line
+    summoner_dict['profile_icon_url'] = profile_icon_url
+    return summoner_dict
 
 def handler(event, context):
     try:
-        puuid = event.get('puuid')
-        if not puuid:
+        fullName = event.get('fullName')
+        if not fullName:
             return {
                 'statusCode': 400,
                 'body': json.dumps({'error': 'puuid is required'})
             }
-        
-        api_keys = [get_secret('API_KEY_DISABLOT'), get_secret('API_KEY_VALKYRIE'), get_secret('API_KEY_RIGSTHULA'), get_secret('API_KEY_RAGNAROK')]
-        headers = {
-            "X-Riot-Token": random.choice(api_keys)
-        }
-        
-        match_ids = get_all_matches_played(puuid, headers)
-        match_details = get_all_match_details(match_ids)
-        
+        summoner_dict = fetch_summoner(fullName)
         return {
             'statusCode': 200,
-            'body': json.dumps({
-                'match_count': len(match_details),
-                'matches': match_details
-            })
+            'body': json.dumps(summoner_dict)
         }
         
     except Exception as e:
