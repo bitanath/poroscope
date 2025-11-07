@@ -57,11 +57,15 @@ def fetch_match_detail(match_id):
     response = requests.get(f"https://americas.api.riotgames.com/lol/match/v5/matches/{match_id}", headers=headers)
     
     if response.status_code == 200:
+        print("Got match",match_id)
         return response.json()
     elif response.status_code == 429:
         retry_after = min(int(response.headers.get('Retry-After', 1)), 5)
         time.sleep(retry_after)
-        
+        headers = {
+            "X-Riot-Token": random.choice(api_keys)
+        }
+    
         response = requests.get(f"https://americas.api.riotgames.com/lol/match/v5/matches/{match_id}", headers=headers)
         return response.json() if response.status_code == 200 else None
     
@@ -70,7 +74,7 @@ def fetch_match_detail(match_id):
 def get_all_match_details(match_ids):
     all_details = []
     
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=24) as executor:
         futures = [executor.submit(fetch_match_detail, match_id) for match_id in match_ids]
         all_details = [future.result() for future in futures if future.result()]
     
