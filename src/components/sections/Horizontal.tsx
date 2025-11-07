@@ -1,7 +1,7 @@
 import React, { useRef, useState, useLayoutEffect, useCallback, useEffect } from "react";
 import { motion, useTransform, useSpring, useMotionValue, MotionValue } from "motion/react";
 
-import StatsCard from "../ui/stats";
+import StatsCard from "../ui/stats-card";
 
 interface UseScrollPercentageOptions {
   threshold?: number;

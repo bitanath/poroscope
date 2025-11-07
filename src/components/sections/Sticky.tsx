@@ -1,24 +1,32 @@
 'use client';
-import { ReactLenis } from '@studio-freight/react-lenis';
+import { ReactLenis,useLenis } from '@studio-freight/react-lenis';
 import { useRef, useState } from 'react';
 import { LightBoard } from '../ui/lightboard';
-import Background from './Background';
 
-import { Card } from './Card';
+import Background from './Background';
+import { Dock } from './Dock';
+
+import { Card } from './Champion';
 import { Image } from '@aws-amplify/ui-react';
 import TextAnimation from '@/components/ui/scroll-text';
 import HorizontalScroller from './Horizontal';
 
 
-export default function Sticky(): JSX.Element {
-    const container = useRef(null);
-    const [activeCardIndex, setActiveCardIndex] = useState(0);
-    const [kda,_] = useState({kills:1000,deaths:100,assists:10})
+export default function Sticky({signOut}:{signOut:()=>void}): JSX.Element {
+  const container = useRef(null);
+  const [dockVisible,setDockVisible] = useState(false);
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const [kda,_] = useState({kills:1000,deaths:100,assists:10})
+
+  useLenis(lenis=>{
+    setDockVisible(lenis.progress > 0.1)
+  })
 
   return (
     <ReactLenis root>
+      <Dock visible={dockVisible} signOut={signOut}/>
       <main className='bg-white' ref={container}>
-        <div className='wrapper'>
+        <div className='wrapper group'>
           <section className='text-white h-screen w-full bg-slate-950 grid place-content-center relative top-0'>
             <div className="absolute inset-0 z-0">
               <Background opacity={0.24}/>
@@ -53,7 +61,7 @@ export default function Sticky(): JSX.Element {
                     },
                 }}
                 />
-              <h1 className='xl:text-xl text-2xl px-8 font-semibold text-center tracking-tight leading-[120%] mt-20'>MadSkilzz, This is your Rift Rewind 👇</h1>
+              <h1 className='dock-trigger xl:text-xl text-2xl px-8 font-semibold text-center tracking-tight leading-[120%] mt-20'>MadSkilzz, This is your Rift Rewind 👇</h1>
             </div>
           </section>
           

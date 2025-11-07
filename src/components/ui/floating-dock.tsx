@@ -11,12 +11,18 @@ import {
 
 import { useRef, useState } from "react";
 
+type DockItem = {
+  title: string;
+  icon: React.ReactNode;
+} & ({ href: string } | { action: () => void });
+
+// Update FloatingDock component
 export const FloatingDock = ({
   items,
   desktopClassName,
   mobileClassName,
 }: {
-  items: { title: string; icon: React.ReactNode; href: string }[];
+  items: DockItem[];
   desktopClassName?: string;
   mobileClassName?: string;
 }) => {
@@ -32,7 +38,7 @@ const FloatingDockMobile = ({
   items,
   className,
 }: {
-  items: { title: string; icon: React.ReactNode; href: string }[];
+  items: DockItem[];
   className?: string;
 }) => {
   const [open, setOpen] = useState(false);
@@ -48,26 +54,29 @@ const FloatingDockMobile = ({
               <motion.div
                 key={item.title}
                 initial={{ opacity: 0, y: 10 }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
+                animate={{ opacity: 1, y: 0 }}
                 exit={{
                   opacity: 0,
                   y: 10,
-                  transition: {
-                    delay: idx * 0.05,
-                  },
+                  transition: { delay: idx * 0.05 },
                 }}
                 transition={{ delay: (items.length - 1 - idx) * 0.05 }}
               >
-                <a
-                  href={item.href}
-                  key={item.title}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-neutral-900"
-                >
-                  <div className="h-4 w-4">{item.icon}</div>
-                </a>
+                {'href' in item ? (
+                  <a
+                    href={item.href}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-neutral-900"
+                  >
+                    <div className="h-4 w-4">{item.icon}</div>
+                  </a>
+                ) : (
+                  <button
+                    onClick={item.action}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-neutral-900"
+                  >
+                    <div className="h-4 w-4">{item.icon}</div>
+                  </button>
+                )}
               </motion.div>
             ))}
           </motion.div>
@@ -77,18 +86,18 @@ const FloatingDockMobile = ({
         onClick={() => setOpen(!open)}
         className="rounded-full w-12 h-12 bg-gray-50 dark:bg-neutral-800"
       >
-        {/* <IconCategory className="h-5 w-5 text-gray-500 dark:text-white" /> */}
         <MenuIcon className="h-4 w-4 transform -translate-x-1 text-gray-100 dark:text-white" />
       </button>
     </div>
   );
 };
 
+// Update FloatingDockDesktop
 const FloatingDockDesktop = ({
   items,
   className,
 }: {
-  items: { title: string; icon: React.ReactNode; href: string }[];
+  items: DockItem[];
   className?: string;
 }) => {
   let mouseX = useMotionValue(Infinity);
@@ -112,57 +121,43 @@ function IconContainer({
   mouseX,
   title,
   icon,
-  href,
+  ...item
 }: {
   mouseX: MotionValue;
   title: string;
   icon: React.ReactNode;
-  href: string;
-}) {
+} & ({ href: string } | { action: () => void })) {
   let ref = useRef<HTMLDivElement>(null);
 
   let distance = useTransform(mouseX, (val) => {
     let bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
-
     return val - bounds.x - bounds.width / 2;
   });
 
   let widthTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40]);
   let heightTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40]);
-
   let widthTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20]);
-  let heightTransformIcon = useTransform(
-    distance,
-    [-150, 0, 150],
-    [20, 40, 20],
-  );
+  let heightTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20]);
 
-  let width = useSpring(widthTransform, {
-    mass: 0.1,
-    stiffness: 150,
-    damping: 12,
-  });
-  let height = useSpring(heightTransform, {
-    mass: 0.1,
-    stiffness: 150,
-    damping: 12,
-  });
-
-  let widthIcon = useSpring(widthTransformIcon, {
-    mass: 0.1,
-    stiffness: 150,
-    damping: 12,
-  });
-  let heightIcon = useSpring(heightTransformIcon, {
-    mass: 0.1,
-    stiffness: 150,
-    damping: 12,
-  });
+  let width = useSpring(widthTransform, { mass: 0.1, stiffness: 150, damping: 12 });
+  let height = useSpring(heightTransform, { mass: 0.1, stiffness: 150, damping: 12 });
+  let widthIcon = useSpring(widthTransformIcon, { mass: 0.1, stiffness: 150, damping: 12 });
+  let heightIcon = useSpring(heightTransformIcon, { mass: 0.1, stiffness: 150, damping: 12 });
 
   const [hovered, setHovered] = useState(false);
 
+  const handleClick = (e: React.MouseEvent) => {
+    if ('action' in item) {
+      e.preventDefault();
+      item.action();
+    }
+  };
+
   return (
-    <a href={href}>
+    <a 
+      href={'href' in item ? item.href : '#'} 
+      onClick={handleClick}
+    >
       <motion.div
         ref={ref}
         style={{ width, height }}

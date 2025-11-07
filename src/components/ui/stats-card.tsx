@@ -1,6 +1,9 @@
 import { Badge } from '@aws-amplify/ui-react';
-import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { ArrowDown, ArrowUp } from 'lucide-react';
+import { Formbar } from '../sections/Formbar';
+import { Card, CardContent, CardHeader, CardTitle } from './card';
+import { CategoryBar } from '../sections/CategoryBar';
+import { ContributionMap } from './heat-map';
 
 interface StatsCardProps {
   title: string;
@@ -44,7 +47,6 @@ const StatsCard: React.FC<StatsCardProps> = ({
                 <feGaussianBlur stdDeviation="10" />
                 </filter>
             </defs>
-            
             <polygon points="150,0 200,0 200,50" fill="#fff" fillOpacity="0.07" />
         </svg>
       <CardHeader className="border-0 z-10 relative pb-2">
@@ -59,6 +61,22 @@ const StatsCard: React.FC<StatsCardProps> = ({
             {delta > 0 ? <ArrowUp /> : <ArrowDown />}&nbsp;
             <span className='text-sm sm:text-xl'>{delta}%</span>
           </Badge>
+          <br />
+          {variant == "purple" && <Formbar />}
+          {variant == "light" && <CategoryBar
+            values={[10, 10, 20, 60]}
+            marker={{ value: 47, tooltip: "Check", showAnimation: true }}
+            colors={["pink", "amber", "emerald", "fuchsia"]}
+            className="mx-auto max-w-screen w-[320px]"
+          />}
+          {variant == "teal" && <CategoryBar
+            values={[30, 70]}
+            labels={["CLASSIC","ARAM"]}
+            colors={["pink", "amber"]}
+            className="mx-auto max-w-screen w-[320px]"
+          />}
+          {variant == "blue" && <ContributionMap></ContributionMap>}
+
         </div>
         <div className="text-sm sm:text-xl text-white/80 border-t border-white/20 pt-3">
           vs {footer || 'average'}:{' '}

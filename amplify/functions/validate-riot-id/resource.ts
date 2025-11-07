@@ -7,5 +7,6 @@ export const validateRiotId = defineFunction({
   environment: {
     NAME: "Validate Riot Id",
     API_KEY: secret('VALKYRIE_RIOT_API_KEY')
-  }
+  },
+  resourceGroupName: "riot-api"
 });

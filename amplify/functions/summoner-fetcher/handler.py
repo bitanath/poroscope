@@ -1,0 +1,108 @@
+import datetime
+import requests
+import random
+import boto3
+import json
+import time
+import os
+from concurrent.futures import ThreadPoolExecutor
+
+def get_secret(secret_name):
+    client = boto3.client('ssm')
+    parameter_name = f"/amplify/shared/d17o49q02hg78d/{secret_name}"
+    response = client.get_parameter(Name=parameter_name, WithDecryption=True)
+    return response['Parameter']['Value']
+
+def fetch_page(page, puuid, headers):
+    specific_datetime = datetime.datetime(2025, 1, 1, 1, 1, 1)
+    epoch_start = int(specific_datetime.timestamp())
+    specific_datetime = datetime.datetime(2026, 1, 1, 1, 1, 1)
+    epoch_end = int(specific_datetime.timestamp())
+    start = page * 100
+    response = requests.get(
+        f"https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start={start}&count=100&startTime={epoch_start}&endTime={epoch_end}",
+        headers=headers
+    )
+    return response.json()
+
+def get_all_matches_played(puuid, headers):
+    all_matches = []
+    page = 0
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        while True:
+            futures = []
+            for i in range(4):
+                futures.append(executor.submit(fetch_page, page + i, puuid, headers))
+            
+            results = [future.result() for future in futures]
+            
+            if any(not result for result in results):
+                for result in results:
+                    if result:
+                        all_matches.extend(result)
+                break
+            
+            for result in results:
+                all_matches.extend(result)
+            
+            page += 4
+    return all_matches
+
+def fetch_match_detail(match_id):
+    api_keys = [get_secret('API_KEY_DISABLOT'), get_secret('API_KEY_VALKYRIE'), get_secret('API_KEY_RIGSTHULA'), get_secret('API_KEY_RAGNAROK')]
+    headers = {
+        "X-Riot-Token": random.choice(api_keys)
+    }
+    
+    response = requests.get(f"https://americas.api.riotgames.com/lol/match/v5/matches/{match_id}", headers=headers)
+    
+    if response.status_code == 200:
+        return response.json()
+    elif response.status_code == 429:
+        retry_after = min(int(response.headers.get('Retry-After', 1)), 5)
+        time.sleep(retry_after)
+        
+        response = requests.get(f"https://americas.api.riotgames.com/lol/match/v5/matches/{match_id}", headers=headers)
+        return response.json() if response.status_code == 200 else None
+    
+    return None
+
+def get_all_match_details(match_ids):
+    all_details = []
+    
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(fetch_match_detail, match_id) for match_id in match_ids]
+        all_details = [future.result() for future in futures if future.result()]
+    
+    return all_details
+
+def handler(event, context):
+    try:
+        puuid = event.get('puuid')
+        if not puuid:
+            return {
+                'statusCode': 400,
+                'body': json.dumps({'error': 'puuid is required'})
+            }
+        
+        api_keys = [get_secret('API_KEY_DISABLOT'), get_secret('API_KEY_VALKYRIE'), get_secret('API_KEY_RIGSTHULA'), get_secret('API_KEY_RAGNAROK')]
+        headers = {
+            "X-Riot-Token": random.choice(api_keys)
+        }
+        
+        match_ids = get_all_matches_played(puuid, headers)
+        match_details = get_all_match_details(match_ids)
+        
+        return {
+            'statusCode': 200,
+            'body': json.dumps({
+                'match_count': len(match_details),
+                'matches': match_details
+            })
+        }
+        
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }
