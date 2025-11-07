@@ -6,7 +6,9 @@ import boto3
 import json
 import time
 import os
+
 from concurrent.futures import ThreadPoolExecutor
+from check import get_json_size
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -123,11 +125,10 @@ def handler(event, context):
         }
         
         match_ids = get_all_matches_played(puuid, headers)
-        logger.info(f"Got {len(match_ids)} matches played")
+        logger.info(f"Heckin yeah, Got {len(match_ids)} matches played")
         match_details = get_all_match_details(match_ids)
-        logger.info(f"Got {len(match_details)} matches details for all")
-        response_json = json.dumps(match_details)
-        size_mb = len(response_json.encode('utf-8')) / (1024 * 1024)
+        logger.info(f"Heckin yeah, Got {len(match_details)} matches details for all")
+        size_mb = get_json_size(match_details)
         return {
             'statusCode': 200,
             'body': json.dumps({
