@@ -11,7 +11,7 @@ def handler(event, context):
     try:
         name = event.get('name')
         summoner_response = lambda_client.invoke(
-            FunctionName='summoner-fetcher',
+            FunctionName='amplify-d17o49q02hg78d-mai-summonerfetcher0450063D-jznr0idRQ0bH',
             InvocationType='RequestResponse',
             Payload=json.dumps({'fullName': name})
         )
@@ -20,7 +20,7 @@ def handler(event, context):
         
         logger.info("Calling match-fetcher... "+puuid)
         match_response = lambda_client.invoke(
-            FunctionName='match-fetcher',
+            FunctionName='amplify-d17o49q02hg78d-main-b-matchfetcher999CBB2E-gPkiyXEK4b8T',
             InvocationType='RequestResponse',
             Payload=json.dumps({'puuid': puuid})
         )
