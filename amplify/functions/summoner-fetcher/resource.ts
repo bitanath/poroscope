@@ -7,7 +7,7 @@ import { Code, Function, Runtime } from "aws-cdk-lib/aws-lambda";
 
 const functionDir = path.dirname(fileURLToPath(import.meta.url));
 
-export const matchFetcher = defineFunction(
+export const summonerFetcher = defineFunction(
   (scope) => {
     return new Function(scope, "match-fetcher", {
       handler: "handler.handler",
