@@ -31,7 +31,7 @@ def get_all_matches_played(puuid, headers):
     with ThreadPoolExecutor(max_workers=4) as executor:
         while True:
             futures = []
-            for i in range(4):
+            for i in range(10):
                 futures.append(executor.submit(fetch_page, page + i, puuid, headers))
             
             results = [future.result() for future in futures]
@@ -85,7 +85,7 @@ def handler(event, context):
                 'body': json.dumps({'error': 'puuid is required'})
             }
         
-        api_keys = [get_secret('API_KEY_DISABLOT'), get_secret('API_KEY_VALKYRIE'), get_secret('API_KEY_RIGSTHULA'), get_secret('API_KEY_RAGNAROK')]
+        api_keys = [get_secret('VALKYRIE_RIOT_API_KEY'), get_secret('DISABLOT_RIOT_API_KEY'), get_secret('RIGSTHULA_RIOT_API_KEY'), get_secret('RAGNAROK_RIOT_API_KEY'), get_secret('LIFTHRASIR_RIOT_API_KEY')]
         headers = {
             "X-Riot-Token": random.choice(api_keys)
         }
