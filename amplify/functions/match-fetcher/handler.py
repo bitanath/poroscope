@@ -1,11 +1,15 @@
 import datetime
 import requests
+import logging
 import random
 import boto3
 import json
 import time
 import os
 from concurrent.futures import ThreadPoolExecutor
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 def get_secret(secret_name):
     client = boto3.client('ssm')
@@ -28,10 +32,11 @@ def fetch_page(page, puuid, headers):
 def get_all_matches_played(puuid, headers):
     all_matches = []
     page = 0
+    logger.info("Starting to get match ids")
     with ThreadPoolExecutor(max_workers=4) as executor:
         while True:
             futures = []
-            for i in range(10):
+            for i in range(4):
                 futures.append(executor.submit(fetch_page, page + i, puuid, headers))
             
             results = [future.result() for future in futures]
@@ -56,7 +61,7 @@ def fetch_match_detail(match_id,api_keys):
     response = requests.get(f"https://americas.api.riotgames.com/lol/match/v5/matches/{match_id}", headers=headers)
     
     if response.status_code == 200:
-        print("Got match",match_id)
+        logger.info("Got match",match_id)
         return response.json()
     elif response.status_code == 429:
         retry_after = min(int(response.headers.get('Retry-After', 1)), 5)
@@ -73,6 +78,7 @@ def fetch_match_detail(match_id,api_keys):
 def get_all_match_details(match_ids):
     all_details = []
     api_keys = [get_secret('VALKYRIE_RIOT_API_KEY'), get_secret('DISABLOT_RIOT_API_KEY'), get_secret('RIGSTHULA_RIOT_API_KEY'), get_secret('RAGNAROK_RIOT_API_KEY'), get_secret('LIFTHRASIR_RIOT_API_KEY')]
+    logger.info("Starting to get match details")
     with ThreadPoolExecutor(max_workers=12) as executor:
         futures = [executor.submit(fetch_match_detail, match_id,api_keys) for match_id in match_ids]
         all_details = [future.result() for future in futures if future.result()]
@@ -94,9 +100,9 @@ def handler(event, context):
         }
         
         match_ids = get_all_matches_played(puuid, headers)
-        print(f"Got {len(match_ids)} matches played")
+        logger.info(f"Got {len(match_ids)} matches played")
         match_details = get_all_match_details(match_ids)
-        print(f"Got {len(match_details)} matches details for all")
+        logger.info(f"Got {len(match_details)} matches details for all")
         return {
             'statusCode': 200,
             'body': json.dumps({
