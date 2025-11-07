@@ -9,7 +9,7 @@ const functionDir = path.dirname(fileURLToPath(import.meta.url));
 
 export const summonerFetcher = defineFunction(
   (scope) => {
-    return new Function(scope, "match-fetcher", {
+    return new Function(scope, "summoner-fetcher", {
       handler: "handler.handler",
       runtime: Runtime.PYTHON_3_10,
       timeout: Duration.seconds(900),
