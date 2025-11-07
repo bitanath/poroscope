@@ -73,7 +73,7 @@ def fetch_match_detail(match_id,api_keys):
 def get_all_match_details(match_ids):
     all_details = []
     api_keys = [get_secret('VALKYRIE_RIOT_API_KEY'), get_secret('DISABLOT_RIOT_API_KEY'), get_secret('RIGSTHULA_RIOT_API_KEY'), get_secret('RAGNAROK_RIOT_API_KEY'), get_secret('LIFTHRASIR_RIOT_API_KEY')]
-    with ThreadPoolExecutor(max_workers=24) as executor:
+    with ThreadPoolExecutor(max_workers=12) as executor:
         futures = [executor.submit(fetch_match_detail, match_id,api_keys) for match_id in match_ids]
         all_details = [future.result() for future in futures if future.result()]
     
