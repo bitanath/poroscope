@@ -23,7 +23,7 @@ export const orchestrator = defineFunction(
       ],
       handler: "handler.handler",
       runtime: Runtime.PYTHON_3_10,
-      timeout: Duration.seconds(60),
+      timeout: Duration.seconds(600),
       memorySize: 1024,
       code: Code.fromAsset(functionDir, {
         bundling: {
