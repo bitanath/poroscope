@@ -19,8 +19,8 @@ export const orchestrator = defineFunction(
       ],
       handler: "handler.handler",
       runtime: Runtime.PYTHON_3_10,
-      timeout: Duration.seconds(900),
-      memorySize: 3008,
+      timeout: Duration.seconds(60),
+      memorySize: 1024,
       code: Code.fromAsset(functionDir, {
         bundling: {
           image: DockerImage.fromRegistry("public.ecr.aws/lambda/python:3.10"),

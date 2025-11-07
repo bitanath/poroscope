@@ -48,8 +48,7 @@ def get_all_matches_played(puuid, headers):
             page += 4
     return all_matches
 
-def fetch_match_detail(match_id):
-    api_keys = [get_secret('VALKYRIE_RIOT_API_KEY'), get_secret('DISABLOT_RIOT_API_KEY'), get_secret('RIGSTHULA_RIOT_API_KEY'), get_secret('RAGNAROK_RIOT_API_KEY'), get_secret('LIFTHRASIR_RIOT_API_KEY')]
+def fetch_match_detail(match_id,api_keys):
     headers = {
         "X-Riot-Token": random.choice(api_keys)
     }
@@ -73,9 +72,9 @@ def fetch_match_detail(match_id):
 
 def get_all_match_details(match_ids):
     all_details = []
-    
+    api_keys = [get_secret('VALKYRIE_RIOT_API_KEY'), get_secret('DISABLOT_RIOT_API_KEY'), get_secret('RIGSTHULA_RIOT_API_KEY'), get_secret('RAGNAROK_RIOT_API_KEY'), get_secret('LIFTHRASIR_RIOT_API_KEY')]
     with ThreadPoolExecutor(max_workers=24) as executor:
-        futures = [executor.submit(fetch_match_detail, match_id) for match_id in match_ids]
+        futures = [executor.submit(fetch_match_detail, match_id,api_keys) for match_id in match_ids]
         all_details = [future.result() for future in futures if future.result()]
     
     return all_details
@@ -95,8 +94,9 @@ def handler(event, context):
         }
         
         match_ids = get_all_matches_played(puuid, headers)
+        print(f"Got {len(match_ids)} matches played")
         match_details = get_all_match_details(match_ids)
-        
+        print(f"Got {len(match_details)} matches details for all")
         return {
             'statusCode': 200,
             'body': json.dumps({
