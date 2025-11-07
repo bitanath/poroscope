@@ -61,7 +61,7 @@ def fetch_match_detail(match_id,api_keys):
     response = requests.get(f"https://americas.api.riotgames.com/lol/match/v5/matches/{match_id}", headers=headers)
     
     if response.status_code == 200:
-        logger.info("Got match",match_id)
+        logger.info("Got match " + match_id)
         return response.json()
     elif response.status_code == 429:
         retry_after = min(int(response.headers.get('Retry-After', 1)), 5)
