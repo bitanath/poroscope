@@ -1,8 +1,12 @@
+import os
 import json
 import boto3
 import logging
 import requests
 
+from strands import Agent
+from strands_tools import calculator
+from strands.models import BedrockModel
 from concurrent.futures import ThreadPoolExecutor,as_completed
 
 logger = logging.getLogger()
@@ -37,28 +41,44 @@ def get_puuid_set(game_name,tag_line):
 
 def handler(event, context):
     lambda_client = boto3.client('lambda')
+    os.environ['AWS_BEARER_TOKEN_BEDROCK'] = get_secret('AWS_BEARER_TOKEN_BEDROCK')
     
     try:
         name = event.get('name')
         [game_name,tag_line] = name.split("#")
 
         puuid_set = get_puuid_set(game_name,tag_line)
-        
-        logger.info("Calling match-fetcher... "+"<-->".join(puuid_set))
+        logger.info("Now invoking match data with puuids")
         match_response = lambda_client.invoke(
             FunctionName='amplify-d17o49q02hg78d-main-b-matchfetcher999CBB2E-gPkiyXEK4b8T',
             InvocationType='RequestResponse',
             Payload=json.dumps({'puuid_set': puuid_set})
         )
-        
+        logger.info("Got back a match response...")
         match_data = json.loads(match_response['Payload'].read())
-        logger.info("Done with match-fetcher... ")
+        logger.info("Done with match-fetching... "+get_secret('AWS_BEARER_TOKEN_BEDROCK'))
         body = json.loads(match_data['body'])
+        status = match_data['statusCode']
         
-        logger.info("Called and got analysed data... ")
+        logger.info("Called and got analysed data... now to analyse using agent")
+        if(status != 200):
+            return {
+                'statusCode': status,
+                'body': json.dumps({'error': f'Unable to get matches for {name}'})
+            }
         
+        #Now analyse using a strands agent
+        model = BedrockModel(model_id="us.amazon.nova-micro-v1:0",
+                temperature=0.1,
+                top_p=0.9)
+        agent = Agent(
+            model=model,
+            system_prompt="You are a helpful assistant."
+        )
+        answer = agent("Hello World")
         return {
             'statusCode': 200,
+            'message': answer.message['content'][0]['text'],
             'body': json.dumps(body)
         }
         

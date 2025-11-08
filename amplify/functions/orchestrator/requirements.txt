@@ -1,2 +1,4 @@
+strands-agents-tools==0.2.14
+strands-agents==1.15.0
 requests==2.31.0
 boto3==1.40.8
