@@ -34,27 +34,6 @@ def get_puuid_set(game_name,tag_line):
     
     return puuid_set
 
-def get_champion_masteries(puuid_valkyrie):
-    api_key = get_secret('VALKYRIE_RIOT_API_KEY')
-    headers = {
-        "X-Riot-Token": api_key
-    }
-    url = f"https://na1.api.riotgames.com//lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid_valkyrie}/top?count=10"
-    response = requests.get(url, headers=headers)
-    top_champion_masteries = response.json()
-    versions = requests.get("https://ddragon.leagueoflegends.com/api/versions.json").json()
-    latest_version = versions[0]
-    raw_champions = requests.get(f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/data/en_US/champion.json")
-    champions = raw_champions.json()
-    champions = [{"id":c['key'],"name":c['id'],"story":c['blurb']} for c in champions['data'].values()]
-    champion_lookup = {int(champ['id']): champ for champ in champions}
-
-    for mastery in top_champion_masteries:
-        champion_id = mastery['championId']
-        champion = champion_lookup.get(champion_id, {})
-        mastery['championName'] = champion.get('name', 'Unknown')
-        mastery['championStory'] = champion.get('story', '')
-
 
 def handler(event, context):
     lambda_client = boto3.client('lambda')
@@ -63,33 +42,23 @@ def handler(event, context):
         name = event.get('name')
         [game_name,tag_line] = name.split("#")
 
-        summoner_response = lambda_client.invoke(
-            FunctionName='amplify-d17o49q02hg78d-mai-summonerfetcher0450063D-jznr0idRQ0bH',
-            InvocationType='RequestResponse',
-            Payload=json.dumps({'fullName': name})
-        )
-        summoner_data = json.loads(summoner_response['Payload'].read())
-        puuid = json.loads(summoner_data['body'])['puuid']
-
         puuid_set = get_puuid_set(game_name,tag_line)
         
         logger.info("Calling match-fetcher... "+"<-->".join(puuid_set))
         match_response = lambda_client.invoke(
             FunctionName='amplify-d17o49q02hg78d-main-b-matchfetcher999CBB2E-gPkiyXEK4b8T',
             InvocationType='RequestResponse',
-            Payload=json.dumps({'puuid': puuid})
+            Payload=json.dumps({'puuid_set': puuid_set})
         )
         
         match_data = json.loads(match_response['Payload'].read())
-        logger.info("Done with match-fetcher... "+match_data['body'])
+        logger.info("Done with match-fetcher... ")
 
         matches = json.loads(match_data['body'])['match_count']
         message = json.loads(match_data['body'])['message']
         size_mb = json.loads(match_data['body'])['size_mb']
         
         logger.info("Called and got totals... "+str(matches))
-
-        get_champion_masteries(puuid_set[0])
 
         
         return {

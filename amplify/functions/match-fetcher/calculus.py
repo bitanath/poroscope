@@ -117,10 +117,19 @@ def arena_games_stats(matches, puuid_set):
     
     return stats
 
-def kills_deaths_assists(matches):
-    total_kills = sum(p['kills'] for match in matches for p in match['info']['participants'])
-    total_deaths = sum(p['deaths'] for match in matches for p in match['info']['participants'])
-    total_assists = sum(p['assists'] for match in matches for p in match['info']['participants'])
+def kills_deaths_assists(matches, puuid_set):
+    total_kills = 0
+    total_deaths = 0
+    total_assists = 0
+    
+    for match in matches:
+        player = next((p for p in match['info']['participants'] if p['puuid'].lower() in puuid_set), None)
+        if not player:
+            continue
+            
+        total_kills += player['kills']
+        total_deaths += player['deaths']
+        total_assists += player['assists']
     
     return {
         'kills': total_kills,
@@ -177,6 +186,70 @@ def avg_damage_mitigated_per_minute(matches, puuid_set):
 #######################
 ## PLAYER SPECIFIC METRICS ##
 #######################
+def player_lane_dominance(matches, puuid_set):
+    lane_stats = {
+        'top': {'player_wins': 0, 'total_games': 0},
+        'jungle': {'player_wins': 0, 'total_games': 0},
+        'mid': {'player_wins': 0, 'total_games': 0},
+        'bottom': {'player_wins': 0, 'total_games': 0},
+        'support': {'player_wins': 0, 'total_games': 0},
+        
+    }
+    
+    lane_mapping = {
+        'TOP': 'top',
+        'JUNGLE': 'jungle', 
+        'MIDDLE': 'mid',
+        'BOTTOM': 'bottom',
+        'UTILITY': 'support'
+    }
+    
+    for match in matches:
+        is_abort = (match['info']['gameDuration'] < 300 or match['info']['endOfGameResult'] != 'GameComplete')
+        if is_abort:
+            continue
+            
+        player = next((p for p in match['info']['participants'] if p['puuid'].lower() in puuid_set), None)
+        if not player:
+            continue
+        
+        if match['info']['gameMode'] != 'CLASSIC':
+            continue
+        
+        # Get player's lane
+        player_lane = lane_mapping.get(player['teamPosition'], 'other')
+        
+        # Find enemy in same lane
+        enemy_in_lane = next((p for p in match['info']['participants'] 
+                             if p['teamId'] != player['teamId'] and p['teamPosition'] == player['teamPosition']), None)
+        
+        if enemy_in_lane:
+            lane_stats[player_lane]['total_games'] += 1
+            
+            # Compare performance
+            player_performance = player['goldEarned'] + (player['totalMinionsKilled'] * 20)
+            enemy_performance = enemy_in_lane['goldEarned'] + (enemy_in_lane['totalMinionsKilled'] * 20)
+            
+            if player_performance > enemy_performance:
+                lane_stats[player_lane]['player_wins'] += 1
+    
+    # Calculate total games across all lanes
+    total_games = sum(lane_stats[lane]['total_games'] for lane in lane_stats.keys())
+    
+    # Calculate weighted dominance percentages
+    dominance_results = {}
+    for lane in lane_stats.keys():
+        if lane_stats[lane]['total_games'] > 0 and total_games > 0:
+            win_rate = lane_stats[lane]['player_wins'] / lane_stats[lane]['total_games']
+            game_weight = lane_stats[lane]['total_games'] / total_games
+            weighted_dominance = round(win_rate * game_weight * 100, 2)
+        else:
+            weighted_dominance = 0
+            
+        dominance_results[f'{lane}_dominance'] = max(round(weighted_dominance),1)
+    
+    return dominance_results
+
 
 def hours_by_lane(matches, puuid_set):
     lane_durations = {'BOTTOM': 0, 'UTILITY': 0, 'MIDDLE': 0, 'NONE': 0, 'TOP': 0, 'JUNGLE': 0}
