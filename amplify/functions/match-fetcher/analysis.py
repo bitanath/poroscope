@@ -6,6 +6,7 @@ def get_json_size(match_details):
     size_mb = len(response_json.encode('utf-8')) / (1024 * 1024)
     return size_mb
 
+
 def top_line_metrics(matches,puuid_set):
     result = {}
     result['hours_played'] = total_hours_played(matches)

@@ -7,8 +7,10 @@ import json
 import time
 import os
 
+from analysis import charts,top_line_metrics,player_metrics,team_metrics,champion_metrics,get_json_size
+from champy import get_champions,get_champion_masteries
 from concurrent.futures import ThreadPoolExecutor
-from analysis import get_json_size
+from metad import del_metadata
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -54,51 +56,6 @@ def get_all_matches_played(puuid, headers):
             
             page += 4
     return all_matches
-
-def del_metadata(match):
-    if match.get('metadata'):
-            del match['metadata']
-        
-    for p in match['info']['participants']:
-        del p['PlayerScore0']
-        del p['PlayerScore1']
-        del p['PlayerScore10']
-        del p['PlayerScore11']
-        del p['PlayerScore2']
-        del p['PlayerScore3']
-        del p['PlayerScore4']
-        del p['PlayerScore5']
-        del p['PlayerScore6']
-        del p['PlayerScore7']
-        del p['PlayerScore8']
-        del p['PlayerScore9']
-        del p['challenges']
-        del p['perks']
-        del p['missions']
-        del p['item0']
-        del p['item1']
-        del p['item2']
-        del p['item3']
-        del p['item4']
-        del p['item5']
-        del p['item6']
-        del p['playerAugment1']
-        del p['playerAugment2']
-        del p['playerAugment3']
-        del p['playerAugment4']
-        del p['playerAugment5']
-        del p['playerAugment6']
-        del p['playerSubteamId']
-        del p['spell1Casts']
-        del p['spell2Casts']
-        del p['spell3Casts']
-        del p['spell4Casts']
-        del p['subteamPlacement']
-        del p['summoner1Casts']
-        del p['summoner1Id']
-        del p['summoner2Casts']
-        del p['summoner2Id']
-    return match
 
 def fetch_match_detail(match_id):
     api_keys = [get_secret('VALKYRIE_RIOT_API_KEY'), get_secret('DISABLOT_RIOT_API_KEY'), get_secret('RIGSTHULA_RIOT_API_KEY'), get_secret('RAGNAROK_RIOT_API_KEY'), get_secret('LIFTHRASIR_RIOT_API_KEY')]
@@ -154,17 +111,34 @@ def handler(event, context):
         match_ids = get_all_matches_played(puuid, headers)
         logger.info(f"Heckin yeah, Got {len(match_ids)} matches played")
         match_details = get_all_match_details(match_ids)
+
         logger.info(f"Heckin yeah, Got {len(match_details)} matches details for all")
-        size_mb = get_json_size(match_details)
+        size_mb = get_json_size(match_details) #Just needs to be <6 MB
+
         #NOTE XXX - convert all puuid set to lowercase in order to do analysis (since case insensitivity happens sometimes)
         puuid_set = set([item.lower() for item in puuid_set]) if puuid_set is not None else set([puuid])
+        #TODO Now get champion data for analysis
+        champions = get_champions()
+        logger.info(f"Got {len(champions)} champions")
+        top_champion_masteries = get_champion_masteries(puuid,champions)
+        logger.info(f"Got {len(top_champion_masteries)} mastery champions")
 
+        #TODO now to get analysis
+        champion_data = champion_metrics(match_details,puuid_set,champions,top_champion_masteries)
+        topline_data = top_line_metrics(match_details,puuid_set)
+        player_data = player_metrics(match_details,puuid_set)
+        team_data = team_metrics(match_details,puuid_set)
+        chart_data = charts(match_details,puuid_set)
+
+        logger.info("Got all analysis "+json.dumps(champion_data))
         return {
             'statusCode': 200,
             'body': json.dumps({
-                'match_count': len(match_details),
-                'message': f'Processed {len(match_details)} matches successfully',
-                'size_mb': size_mb
+                'champion_data': champion_data,
+                'topline_data': topline_data,
+                'player_data': player_data,
+                'team_data': team_data,
+                'chart_data': chart_data
             })
         }
         

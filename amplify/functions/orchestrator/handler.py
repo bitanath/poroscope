@@ -53,21 +53,13 @@ def handler(event, context):
         
         match_data = json.loads(match_response['Payload'].read())
         logger.info("Done with match-fetcher... ")
-
-        matches = json.loads(match_data['body'])['match_count']
-        message = json.loads(match_data['body'])['message']
-        size_mb = json.loads(match_data['body'])['size_mb']
+        body = json.loads(match_data['body'])
         
-        logger.info("Called and got totals... "+str(matches))
-
+        logger.info("Called and got analysed data... ")
         
         return {
             'statusCode': 200,
-            'body': json.dumps({
-                'matches_count': matches,
-                'message': message,
-                'size_mb': size_mb
-            })
+            'body': json.dumps(body)
         }
         
     except Exception as e:
