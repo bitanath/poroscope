@@ -1,5 +1,4 @@
 import requests
-from handler import get_secret
 
 def get_champions():
     versions = requests.get("https://ddragon.leagueoflegends.com/api/versions.json").json()
@@ -9,8 +8,7 @@ def get_champions():
     champions = [{"id":c['key'],"name":c['id'],"story":c['blurb']} for c in champions['data'].values()]
     return champions
 
-def get_champion_masteries(puuid_valkyrie,champions):
-    api_key = get_secret('VALKYRIE_RIOT_API_KEY')
+def get_champion_masteries(api_key,puuid_valkyrie,champions):
     headers = {
         "X-Riot-Token": api_key
     }

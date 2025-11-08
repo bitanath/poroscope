@@ -104,8 +104,9 @@ def handler(event, context):
             puuid_set = list(puuid_set)
             puuid = puuid_set[0] #guaranteed to be Valkyrie
         
+        default_api_key = get_secret('VALKYRIE_RIOT_API_KEY')
         headers = {
-            "X-Riot-Token": get_secret('VALKYRIE_RIOT_API_KEY')
+            "X-Riot-Token": default_api_key
         }
         
         match_ids = get_all_matches_played(puuid, headers)
@@ -120,7 +121,7 @@ def handler(event, context):
         #TODO Now get champion data for analysis
         champions = get_champions()
         logger.info(f"Got {len(champions)} champions")
-        top_champion_masteries = get_champion_masteries(puuid,champions)
+        top_champion_masteries = get_champion_masteries(default_api_key,puuid,champions)
         logger.info(f"Got {len(top_champion_masteries)} mastery champions")
 
         #TODO now to get analysis

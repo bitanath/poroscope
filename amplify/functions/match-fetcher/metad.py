@@ -1,3 +1,5 @@
+import json
+
 def del_metadata(match):
     if match.get('metadata'):
             del match['metadata']
