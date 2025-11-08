@@ -75,9 +75,33 @@ def del_metadata(match):
         del p['challenges']
         del p['perks']
         del p['missions']
+        del p['item0']
+        del p['item1']
+        del p['item2']
+        del p['item3']
+        del p['item4']
+        del p['item5']
+        del p['item6']
+        del p['playerAugment1']
+        del p['playerAugment2']
+        del p['playerAugment3']
+        del p['playerAugment4']
+        del p['playerAugment5']
+        del p['playerAugment6']
+        del p['playerSubteamId']
+        del p['spell1Casts']
+        del p['spell2Casts']
+        del p['spell3Casts']
+        del p['spell4Casts']
+        del p['subteamPlacement']
+        del p['summoner1Casts']
+        del p['summoner1Id']
+        del p['summoner2Casts']
+        del p['summoner2Id']
     return match
 
-def fetch_match_detail(match_id,api_keys):
+def fetch_match_detail(match_id):
+    api_keys = [get_secret('VALKYRIE_RIOT_API_KEY'), get_secret('DISABLOT_RIOT_API_KEY'), get_secret('RIGSTHULA_RIOT_API_KEY'), get_secret('RAGNAROK_RIOT_API_KEY'), get_secret('LIFTHRASIR_RIOT_API_KEY')]
     headers = {
         "X-Riot-Token": random.choice(api_keys)
     }
@@ -102,10 +126,10 @@ def fetch_match_detail(match_id,api_keys):
 
 def get_all_match_details(match_ids):
     all_details = []
-    api_keys = [get_secret('VALKYRIE_RIOT_API_KEY'), get_secret('DISABLOT_RIOT_API_KEY'), get_secret('RIGSTHULA_RIOT_API_KEY'), get_secret('RAGNAROK_RIOT_API_KEY'), get_secret('LIFTHRASIR_RIOT_API_KEY')]
+   
     logger.info("Starting to get match details")
     with ThreadPoolExecutor(max_workers=8) as executor:
-        futures = [executor.submit(fetch_match_detail, match_id,api_keys) for match_id in match_ids]
+        futures = [executor.submit(fetch_match_detail, match_id) for match_id in match_ids]
         all_details = [future.result() for future in futures if future.result()]
     
     return all_details
@@ -119,9 +143,8 @@ def handler(event, context):
                 'body': json.dumps({'error': 'puuid is required'})
             }
         
-        api_keys = [get_secret('VALKYRIE_RIOT_API_KEY'), get_secret('DISABLOT_RIOT_API_KEY'), get_secret('RIGSTHULA_RIOT_API_KEY'), get_secret('RAGNAROK_RIOT_API_KEY'), get_secret('LIFTHRASIR_RIOT_API_KEY')]
         headers = {
-            "X-Riot-Token": random.choice(api_keys)
+            "X-Riot-Token": get_secret('VALKYRIE_RIOT_API_KEY')
         }
         
         match_ids = get_all_matches_played(puuid, headers)
