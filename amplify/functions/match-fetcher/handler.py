@@ -24,12 +24,14 @@ def get_champions():
     return champions
 
 def get_champion_masteries(api_key,puuid_valkyrie,champions):
-    logger.info("Getting champions masteries")
+    logger.info("Getting champions masteries"+api_key)
     headers = {
         "X-Riot-Token": api_key
     }
-    url = f"https://na1.api.riotgames.com//lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid_valkyrie}/top?count=10"
+    url = f"https://na1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid_valkyrie}/top?count=10"
     response = requests.get(url, headers=headers)
+    logger.info("Got response from url")
+    logger.info(f"Response headers: {response.headers}")
     top_champion_masteries = response.json()
     logger.info("Got top champions masteries"+json.dumps(top_champion_masteries[0]))
     champion_lookup = {int(champ['id']): champ for champ in champions}
