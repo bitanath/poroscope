@@ -23,3 +23,5 @@ def get_champion_masteries(api_key,puuid_valkyrie,champions):
         champion = champion_lookup.get(champion_id, {})
         mastery['championName'] = champion.get('name', 'Unknown')
         mastery['championStory'] = champion.get('story', '')
+
+    return top_champion_masteries

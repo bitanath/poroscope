@@ -121,15 +121,21 @@ def handler(event, context):
         #TODO Now get champion data for analysis
         champions = get_champions()
         logger.info(f"Got {len(champions)} champions")
+        logger.info(f"Now fetching champion masteries {default_api_key} {puuid}")
         top_champion_masteries = get_champion_masteries(default_api_key,puuid,champions)
         logger.info(f"Got {len(top_champion_masteries)} mastery champions")
 
         #TODO now to get analysis
         champion_data = champion_metrics(match_details,puuid_set,champions,top_champion_masteries)
+        logger.info("Got champion data")
         topline_data = top_line_metrics(match_details,puuid_set)
+        logger.info("Got top line data")
         player_data = player_metrics(match_details,puuid_set)
+        logger.info("Got player data")
         team_data = team_metrics(match_details,puuid_set)
+        logger.info("Got team data")
         chart_data = charts(match_details,puuid_set)
+        logger.info("Got chart data")
 
         logger.info("Got all analysis "+json.dumps(champion_data))
         return {

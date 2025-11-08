@@ -23,7 +23,7 @@ def top_line_metrics(matches,puuid_set):
     result['avg_damage_mitigated_per_minute'] = avg_damage_mitigated_per_minute(matches, puuid_set)
     result['hours_by_lane'] = hours_by_lane(matches, puuid_set)
     result['role_percentage'] = role_percentage(matches, puuid_set)
-    return
+    return result
 
 def charts(matches,puuid_set):
     result = {}
