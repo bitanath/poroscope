@@ -26,6 +26,8 @@ def handler(event, context):
         )
         
         match_data = json.loads(match_response['Payload'].read())
+        logger.info("Done with match-fetcher... "+match_response['Payload'].read())
+        
         matches = json.loads(match_data['body'])['match_count']
         message = json.loads(match_data['body'])['message']
         size_mb = json.loads(match_data['body'])['size_mb']

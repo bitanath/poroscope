@@ -8,7 +8,7 @@ import time
 import os
 
 from concurrent.futures import ThreadPoolExecutor
-from check import get_json_size
+from analysis import get_json_size
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
