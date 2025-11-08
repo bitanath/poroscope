@@ -1,5 +1,4 @@
 import requests
-from logging import logger
 
 def get_champions():
     versions = requests.get("https://ddragon.leagueoflegends.com/api/versions.json").json()

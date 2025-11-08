@@ -8,12 +8,39 @@ import time
 import os
 
 from analysis import charts,top_line_metrics,player_metrics,team_metrics,champion_metrics,get_json_size
-from champy import get_champions,get_champion_masteries
+# from champy import get_champions,get_champion_masteries
 from concurrent.futures import ThreadPoolExecutor
 from metad import del_metadata
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+def get_champions():
+    versions = requests.get("https://ddragon.leagueoflegends.com/api/versions.json").json()
+    latest_version = versions[0]
+    raw_champions = requests.get(f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/data/en_US/champion.json")
+    champions = raw_champions.json()
+    champions = [{"id":c['key'],"name":c['id'],"story":c['blurb']} for c in champions['data'].values()]
+    return champions
+
+def get_champion_masteries(api_key,puuid_valkyrie,champions):
+    logger.info("Getting champions masteries")
+    headers = {
+        "X-Riot-Token": api_key
+    }
+    url = f"https://na1.api.riotgames.com//lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid_valkyrie}/top?count=10"
+    response = requests.get(url, headers=headers)
+    top_champion_masteries = response.json()
+    logger.info("Got top champions masteries")
+    champion_lookup = {int(champ['id']): champ for champ in champions}
+
+    for mastery in top_champion_masteries:
+        champion_id = mastery['championId']
+        champion = champion_lookup.get(champion_id, {})
+        mastery['championName'] = champion.get('name', 'Unknown')
+        mastery['championStory'] = champion.get('story', '')
+
+    return top_champion_masteries
 
 def get_secret(secret_name):
     client = boto3.client('ssm')
@@ -123,7 +150,7 @@ def handler(event, context):
         logger.info(f"Got {len(champions)} champions")
         logger.info(f"Now fetching champion masteries {default_api_key} {puuid} {champions[0]['name']}")
         top_champion_masteries = get_champion_masteries(default_api_key,puuid,champions)
-        logger.info(f"Got {len(top_champion_masteries)} mastery champions")
+        logger.info(f"Got mastery champions...")
 
         #TODO now to get analysis
         logger.info("Now doing analysis...")
