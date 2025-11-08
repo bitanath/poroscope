@@ -8,41 +8,14 @@ import time
 import os
 
 from analysis import charts,top_line_metrics,player_metrics,team_metrics,champion_metrics,get_json_size
-# from champy import get_champions,get_champion_masteries
+from champy import get_champions,get_champion_masteries
 from concurrent.futures import ThreadPoolExecutor
 from metad import del_metadata
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-def get_champions():
-    versions = requests.get("https://ddragon.leagueoflegends.com/api/versions.json").json()
-    latest_version = versions[0]
-    raw_champions = requests.get(f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/data/en_US/champion.json")
-    champions = raw_champions.json()
-    champions = [{"id":c['key'],"name":c['id'],"story":c['blurb']} for c in champions['data'].values()]
-    return champions
 
-def get_champion_masteries(api_key,puuid_valkyrie,champions):
-    logger.info("Getting champions masteries"+api_key)
-    headers = {
-        "X-Riot-Token": api_key
-    }
-    url = f"https://na1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid_valkyrie}/top?count=10"
-    response = requests.get(url, headers=headers)
-    logger.info("Got response from url")
-    logger.info(f"Response headers: {response.headers}")
-    top_champion_masteries = response.json()
-    logger.info("Got top champions masteries"+json.dumps(top_champion_masteries[0]))
-    champion_lookup = {int(champ['id']): champ for champ in champions}
-    logger.info("Got champion lookup"+json.dumps(champion_lookup))
-    for mastery in top_champion_masteries:
-        champion_id = mastery['championId']
-        champion = champion_lookup.get(champion_id, {})
-        mastery['championName'] = champion.get('name', 'Unknown')
-        mastery['championStory'] = champion.get('story', '')
-    logger.info("Now added story and name to mastery"+json.dumps(top_champion_masteries[0]))
-    return top_champion_masteries
 
 def get_secret(secret_name):
     client = boto3.client('ssm')
@@ -156,8 +129,8 @@ def handler(event, context):
 
         #TODO now to get analysis
         logger.info("Now doing analysis...")
-        # champion_data = champion_metrics(match_details,puuid_set,champions,top_champion_masteries)
-        # logger.info("Got champion data")
+        champion_data = champion_metrics(match_details,puuid_set,champions,top_champion_masteries)
+        logger.info("Got champion data")
         topline_data = top_line_metrics(match_details,puuid_set)
         logger.info("Got top line data")
         player_data = player_metrics(match_details,puuid_set)
@@ -171,7 +144,7 @@ def handler(event, context):
         return {
             'statusCode': 200,
             'body': json.dumps({
-                # 'champion_data': champion_data,
+                'champion_data': champion_data,
                 'topline_data': topline_data,
                 'player_data': player_data,
                 'team_data': team_data,
