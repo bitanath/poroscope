@@ -4,9 +4,7 @@ import boto3
 import logging
 import requests
 
-from strands import Agent
-from strands_tools import calculator
-from strands.models import BedrockModel
+from agents import analyse_data
 from concurrent.futures import ThreadPoolExecutor,as_completed
 
 logger = logging.getLogger()
@@ -66,19 +64,12 @@ def handler(event, context):
                 'statusCode': status,
                 'body': json.dumps({'error': f'Unable to get matches for {name}'})
             }
-        
-        #Now analyse using a strands agent
-        model = BedrockModel(model_id="us.amazon.nova-micro-v1:0",
-                temperature=0.1,
-                top_p=0.9)
-        agent = Agent(
-            model=model,
-            system_prompt="You are a helpful assistant."
-        )
-        answer = agent("Hello World")
+        logger.info("Sending message to agent")
+        message = analyse_data(body)
+        logger.info("Got message from agent")
         return {
             'statusCode': 200,
-            'message': answer.message['content'][0]['text'],
+            'message': message,
             'body': json.dumps(body)
         }
         
