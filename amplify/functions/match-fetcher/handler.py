@@ -127,8 +127,8 @@ def handler(event, context):
 
         #TODO now to get analysis
         logger.info("Now doing analysis...")
-        champion_data = champion_metrics(match_details,puuid_set,champions,top_champion_masteries)
-        logger.info("Got champion data")
+        # champion_data = champion_metrics(match_details,puuid_set,champions,top_champion_masteries)
+        # logger.info("Got champion data")
         topline_data = top_line_metrics(match_details,puuid_set)
         logger.info("Got top line data")
         player_data = player_metrics(match_details,puuid_set)
@@ -138,11 +138,11 @@ def handler(event, context):
         chart_data = charts(match_details,puuid_set)
         logger.info("Got chart data")
 
-        logger.info("Got all analysis "+json.dumps(champion_data))
+        
         return {
             'statusCode': 200,
             'body': json.dumps({
-                'champion_data': champion_data,
+                # 'champion_data': champion_data,
                 'topline_data': topline_data,
                 'player_data': player_data,
                 'team_data': team_data,
