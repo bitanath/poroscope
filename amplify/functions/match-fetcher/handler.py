@@ -137,11 +137,15 @@ def get_all_match_details(match_ids):
 def handler(event, context):
     try:
         puuid = event.get('puuid')
-        if not puuid:
+        puuid_set = event.get('puuid_set')
+        if not puuid and not puuid_set:
             return {
                 'statusCode': 400,
                 'body': json.dumps({'error': 'puuid is required'})
             }
+        elif not puuid:
+            puuid_set = list(puuid_set)
+            puuid = puuid_set[0] #guaranteed to be Valkyrie
         
         headers = {
             "X-Riot-Token": get_secret('VALKYRIE_RIOT_API_KEY')
@@ -152,6 +156,9 @@ def handler(event, context):
         match_details = get_all_match_details(match_ids)
         logger.info(f"Heckin yeah, Got {len(match_details)} matches details for all")
         size_mb = get_json_size(match_details)
+        #NOTE XXX - convert all puuid set to lowercase in order to do analysis (since case insensitivity happens sometimes)
+        puuid_set = set([item.lower() for item in puuid_set])
+
         return {
             'statusCode': 200,
             'body': json.dumps({
