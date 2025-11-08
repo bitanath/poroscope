@@ -157,7 +157,7 @@ def handler(event, context):
         logger.info(f"Heckin yeah, Got {len(match_details)} matches details for all")
         size_mb = get_json_size(match_details)
         #NOTE XXX - convert all puuid set to lowercase in order to do analysis (since case insensitivity happens sometimes)
-        puuid_set = set([item.lower() for item in puuid_set])
+        puuid_set = set([item.lower() for item in puuid_set]) if puuid_set is not None else set([puuid])
 
         return {
             'statusCode': 200,
