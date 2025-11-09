@@ -103,8 +103,16 @@ def handler(event, context):
                         item = response['Item']
                         item['public'] = True
                         cache_table.put_item(Item=item)
+                        return {
+                            'statusCode': 200,
+                            'body': response['Item']['data']
+                        }
                     except:
-                        pass
+                        logger.error("Error while making public")
+                        return {
+                            'statusCode': 424,
+                            'body': "unable make it public"
+                        }
                 elif cacher is not None and not response['Item']['public']:
                     return {
                         'statusCode': 401,
@@ -120,8 +128,8 @@ def handler(event, context):
                             'statusCode': 404,
                             'body': "unable to find the cached report provided"
                         }
-        except:
-            pass
+        except Exception as e:
+            logger.error(e)
         
         
         puuid_set = get_puuid_set(game_name,tag_line,mega)
@@ -133,7 +141,7 @@ def handler(event, context):
         )
         logger.info("Got back a match response...")
         match_data = json.loads(match_response['Payload'].read())
-        logger.info("Done with match-fetching... "+get_secret('AWS_BEARER_TOKEN_BEDROCK'))
+        logger.info("Done with match-fetching... ")
         body = json.loads(match_data['body'])
         status = match_data['statusCode']
         
