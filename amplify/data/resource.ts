@@ -29,7 +29,10 @@ const schema = a.schema({
     .query()
     .arguments({
       name: a.string(),
-      region: a.string()
+      region: a.string(),
+      delete: a.boolean(),
+      cacheKey: a.string(),
+      publicize: a.boolean()
     })
     .returns(a.json())
     .authorization(allow => [allow.publicApiKey()])

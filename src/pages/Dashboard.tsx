@@ -74,7 +74,8 @@ export default function Dashboard({ signOut }: DashboardProps) {
       Payload: JSON.stringify({
         arguments: {
           name: riotId,
-          region: region
+          region: region,
+          delete: true
         }
       })
     });

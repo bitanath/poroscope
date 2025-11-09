@@ -67,31 +67,43 @@ def handler(event, context):
         name = event['arguments'].get('name')
         region = event['arguments'].get('region')  if event['arguments'].get('region') is not None else 'NA1'
         delete_cache = event['arguments'].get('delete', False)
+        make_public = event['arguments'].get('publicize', False)
         mega = get_mega_region(region) if region is not None else 'americas'
+        cacher = event['arguments'].get('cacheKey')
 
         [game_name,tag_line] = name.split("#")
 
         dynamodb = boto3.resource('dynamodb')
         table_name = 'CACHE_REPORTS'
         cache_table = dynamodb.Table(table_name)
-            
-        cache_key = hashlib.md5(f"{name}#{region}".encode()).hexdigest()[:8]
+        cache_key = hashlib.md5(f"{name}#{region}".encode()).hexdigest()[:8] if cacher is None else cacher
+        logger.info("Found cache table now checking cache_key "+cache_key)
         
         try:
             response = cache_table.get_item(Key={'id': cache_key})
             if 'Item' in response:
+                logger.info("Cache item found, fetching from there")
                 if delete_cache:
                     try:
                         cache_table.delete_item(Key={'id': cache_key})
+                        logger.info("Deleted cache item")
                         return {
                             'statusCode': 200,
                             'body': "deleted successfully"
                         }
                     except:
+                        logger.error("Error while deleting cache item")
                         return {
                             'statusCode': 424,
                             'body': "unable to delete due to internal error"
                         }
+                elif make_public:
+                    try:
+                        item = response['Item']
+                        item['public'] = True
+                        cache_table.put_item(Item=item)
+                    except:
+                        pass
                 return {
                     'statusCode': 200,
                     'body': response['Item']['data']
@@ -122,6 +134,7 @@ def handler(event, context):
         message = fetch_insights(body)
         logger.info("Got insights from agent")
         try:
+            logger.info("Putting item in cache "+cache_key)
             cache_table.put_item(
                 Item={
                     'id': cache_key,
@@ -129,6 +142,7 @@ def handler(event, context):
                 }
             )
         except:
+            logger.info("Errored out while caching")
             pass
         return {
             'statusCode': 200,
