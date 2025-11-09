@@ -166,7 +166,7 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
               {championMastery?.mastery.slice(0,5).map((item, index) => (
                 <div className="wrapper">
                 <Card 
-                  key={item.name} 
+                  key={item.name+"-"+item.title+"-"+index.toString()} 
                   name={item.name} 
                   stat={item.title}
                   index={index} 
@@ -216,7 +216,7 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
               {championData?.nemesis.slice(0,5).map((item, index) => (
                 <div className="wrapper">
                 <Card 
-                  key={item.name} 
+                  key={item.name+"-"+item.title+"-"+index.toString()} 
                   name={item.name} 
                   stat={item.title}
                   index={index} 
@@ -281,7 +281,7 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
               {championData?.banned.slice(0,5).map((item, index) => (
                 <div className="wrapper">
                 <Card 
-                  key={item.name} 
+                  key={item.name+"-"+item.title+"-"+index.toString()} 
                   name={item.name} 
                   stat={item.title}
                   index={index} 

@@ -28,7 +28,7 @@ const fetchUser = async ()=>{
 }
 
 const fetchProfilePic = async (fullName:string,region:string)=>{
-  const client = generateClient<Schema>()
+  const client = generateClient<Schema>({authMode: 'userPool'})
   const profile = await client.queries.summonerFetcher({
       fullName: fullName,
       region: region
@@ -79,7 +79,7 @@ export default function Home({ signOut }: HomeProps) {
           const {riotId, region, session} = await fetchUser()
           if(!riotId) throw "Riot ID absent from database"
           const profile = await fetchProfilePic(riotId,region!.toUpperCase())
-          
+          console.log(riotId, region,profile)
           const profileData = JSON.parse(profile.data?.toString()||"{}")
           const profileDetails = JSON.parse(profileData.body.toString()||"{}")
           if(!profileDetails || !profileDetails.profile_icon_url) throw "Unable to fetch profile"

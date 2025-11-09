@@ -1,11 +1,13 @@
 import { useParams, useSearchParams } from 'react-router-dom';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { useEffect, useState, useRef } from 'react';
-import { LambdaClient,InvokeCommand } from '@aws-sdk/client-lambda';
+import { generateClient } from 'aws-amplify/api';
+import { Schema } from 'amplify/data/resource';
 import Summary from '@/components/report/Summary';
-import { Button } from '@aws-amplify/ui-react';
+import { Loader, Message } from '@aws-amplify/ui-react';
 
 import { ChampionData, ChampionMastery, ChartData, PlayerData, PlayerInsights, TeamData, TeamInsights, ToplineData, ToplineInsights } from "@/components/report/types";
+import { VStack } from '@/components/sections/Stacks';
 
 export default function Generated(){
   const { id } = useParams();
@@ -30,20 +32,12 @@ export default function Generated(){
   const [teamInsight,setTeamInsight] = useState<TeamInsights|null>(null)
   const [teamData,setTeamData] = useState<TeamData|null>(null)
 
-  const fetchGameData = async (cacheIdentifier: string, session: any, publicize=false) => {
-    const client = new LambdaClient({ region: 'us-east-1',credentials: session.credentials });
-    const command = new InvokeCommand({
-      FunctionName: 'amplify-d17o49q02hg78d-main-b-orchestratorDDCE86FA-h6z54lCpyUFr', // Your function name
-      Payload: JSON.stringify({
-        arguments: {
-          cacheKey: cacheIdentifier,
-          publicize: publicize
-        }
-      })
-    });
-    
-    const response = await client.send(command);
-    const result = JSON.parse(new TextDecoder().decode(response.Payload));
+  const fetchGameData = async (cacheIdentifier: string, publicize=false) => {
+    const client = generateClient<Schema>()
+    const result = await client.queries.publicFetcher({
+        cacheKey: cacheIdentifier,
+        publicize: publicize
+    })
     
     return result;
   };
@@ -67,9 +61,10 @@ export default function Generated(){
             publicize = true
           }
 
-          const response = await fetchGameData(farmHash!,session,publicize)
-          const gameData = JSON.parse(response.body?.toString()||'{"error":"Fetched blank game data"}')
-          console.log("Got result",gameData,gameData.statusCode,gameData.body)
+          const response = await fetchGameData(farmHash!,publicize)
+          const {body} = JSON.parse(response.data?.toString() ||'{"error":"Fetched blank game data"}')
+          const gameData = JSON.parse(body)
+          console.log("Got result",gameData)
           if(!gameData || gameData.error) throw "Unable to fetch game data"
           setTopline(gameData.topline_data)
           setTopInsight(gameData.topline_insights)
@@ -81,7 +76,7 @@ export default function Generated(){
           setTeamData(gameData.team_data)
           setTeamInsight(gameData.team_insights)
 
-          console.log(session,id)
+          console.log("Got session and id: ",session,id,farmHash)
           setLoading(false)
       }catch(e){
         setError(true)
@@ -101,7 +96,7 @@ export default function Generated(){
   };
   
   return (
-    <div>
+    <div className="w-screen h-screen">
       {!loading && !error && <Summary 
                     setDockVisible={setDockVisible}
                     sharedReport={true}
@@ -115,15 +110,20 @@ export default function Generated(){
                     teamData={teamData}
                     teamInsight={teamInsight}
             ></Summary>}
-      {!loading && error && <Button isLoading={loading} loadingText="Loading..." variation="destructive">
-        Loading Report
-      </Button>}
-      {loading && !error && <Button isLoading={loading} loadingText="Loading..." variation="primary">
-        Loading Report
-      </Button>}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+      {!loading && error && <Message
+        variation="filled"
+        colorTheme="error"
+        heading="Unable to load generated poroscope">
+        The account might not have made it public
+      </Message>}
+      {loading && !error && 
+        <VStack className='w-screen h-screen flex items-center justify-center' style={{height: '100vh'}} justifyContent={"center"} alignItems={"center"}>
+          <Loader size='large' />
+        </VStack>
+      }
+      {showModal && !loading && !error && (
+        <div className="fixed left-1/3 top-1/3 bg-transparent max-h-sm max-w-md w-full flex items-center justify-center z-500">
+          <div className="bg-white z-100 p-6 rounded-lg max-w-md w-full mx-4 shadow-2xl" style={{boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'}}>
             <h3 className="text-lg font-semibold mb-4">Share Link</h3>
             <div className="flex gap-2 mb-4">
               <input 
