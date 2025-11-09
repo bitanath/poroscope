@@ -9,7 +9,7 @@ export const handler: Schema["publicFetcher"]["functionHandler"] = async (event,
       FunctionName: 'amplify-d17o49q02hg78d-main-b-orchestratorDDCE86FA-h6z54lCpyUFr', // Use actual function name
       Payload: JSON.stringify({
         arguments: {
-          name: event.arguments.cacheKey,
+          cacheKey: event.arguments.cacheKey,
           publicize: event.arguments.publicize
         }
       })
