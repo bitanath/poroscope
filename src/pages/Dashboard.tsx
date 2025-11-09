@@ -8,7 +8,8 @@ import {
   IconLogout,
   IconHome,
   IconPower,
-  IconTrash
+  IconTrash,
+  IconRefresh
 } from "@tabler/icons-react";
 
 import { VStack } from '@/components/sections/Stacks';
@@ -112,8 +113,8 @@ export default function Dashboard({ signOut }: DashboardProps) {
       header: <VStack alignItems={"center"} justifyContent={"center"} height={280}>
           <AccountSettings.DeleteUser onSuccess={handleDeletion} />
           <button onClick={()=>{refreshCache(userAttributes,userSession)}} className="flex items-center gap-2 px-4 py-2 bg-orange-600/80!">
-            <IconTrash size={16} />
-            Delete Cache
+            <IconRefresh size={16} />
+            Refresh Cache
           </button>
         </VStack>,
       className: "md:col-span-1",

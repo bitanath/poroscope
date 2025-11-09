@@ -84,7 +84,8 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
                     },
                 }}
                 />
-              <h1 className='dock-trigger xl:text-xl text-2xl px-8 font-semibold text-center tracking-tight leading-[120%] mt-20'>{profileDetails?.name}, This is your Rift Rewind 👇</h1>
+              {!sharedReport && <h1 className='dock-trigger xl:text-xl text-2xl px-8 font-semibold text-center tracking-tight leading-[120%] mt-20'>{profileDetails?.name}, This is your Rift Rewind 👇</h1>}
+              {sharedReport && <h1 className='dock-trigger xl:text-xl text-2xl px-8 font-semibold text-center tracking-tight leading-[120%] mt-20'>Welcome to this shared Rift Rewind 👇</h1>}
             </div>
           </section>
           
@@ -120,7 +121,7 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
 
                   <ChartCard variant='category-split' title='Win Percentage by Game Mode' data={Object.values(chartData!.game_mode_win_percentage)} labels={Object.keys(chartData!.game_mode_win_percentage).map(a=>a.replace("_win_percentage",""))} footer={`${chartData!.game_mode_win_percentage.aram_win_percentage}% ARAM vs ${chartData!.game_mode_win_percentage.classic_win_percentage}% Classic games won`}></ChartCard>
 
-                  <ChartCard variant='contribution-map' title='Games Won over The Year' data={chartData!.win_percentage_heatmap} label='%' footer="Heatmap of win percentage (All Game Modes)"></ChartCard>
+                  <ChartCard variant='contribution-map' title='Win Percentage over The Year' data={chartData!.win_percentage_heatmap} label='%' footer="Heatmap of win percentage (All Game Modes)"></ChartCard>
 
                   <ChartCard variant='category-bar' title='Player Lane Dominance' data={Object.values(chartData!.player_lane_dominance)} labels={Object.keys(chartData!.player_lane_dominance).map(a=>a.replace("_dominance",""))} label={Object.entries(chartData!.player_lane_dominance).reduce((a, b) => a[1] > b[1] ? a : b)[0]} footer="Lane Dominance (All Game Modes)"></ChartCard>
 
@@ -177,11 +178,11 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
               ))}
             </div>
             <div className='sticky top-0 h-screen grid place-content-center'>
-              <h1 className='text-xl md:text-4xl pl-16 font-bold text-right tracking-tight leading-[120%]'>
+              <h1 className='text-xl md:text-4xl pl-24 md:pl-16 font-bold text-right tracking-tight leading-[120%]'>
                 Your Champion Mastery
               </h1>
               <br/>
-              <h1 className='text-xl md:text-4xl pl-16 font-medium text-right tracking-tight leading-[120%]'>
+              <h1 className='text-md md:text-4xl pl-24 md:pl-16 font-medium text-right tracking-tight leading-[120%]'>
                 {championMastery?.insight_mastery} 👑
               </h1>
             </div>
@@ -227,11 +228,11 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
               ))}
             </div>
             <div className='sticky top-0 h-screen grid place-content-center'>
-              <h1 className='text-xl md:text-4xl pl-16 font-bold text-right tracking-tight leading-[120%]'>
+              <h1 className='text-xl md:text-4xl pl-24 md:pl-16 font-bold text-right tracking-tight leading-[120%]'>
                 Champions that were your Nemesis
               </h1>
               <br/>
-              <h1 className='text-xl md:text-4xl pl-16 font-medium text-right tracking-tight leading-[120%]'>
+              <h1 className='text-md md:text-4xl pl-24 md:pl-16 font-medium text-right tracking-tight leading-[120%]'>
                 These champions unalived you the most. Compared and normalized against your opponents and teammates. 💀
               </h1>
             </div>
@@ -269,7 +270,7 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
 
                   <StatsCard title="Gini Coefficient - Damage" value={playerData!.damage_gini_coefficient.gini_with_player.toFixed(2)} delta={playerData!.damage_gini_coefficient.gini_with_player - playerData!.damage_gini_coefficient.gini_without_player} average={playerData!.damage_gini_coefficient.gini_without_player.toFixed(2)} footer='Gini Coefficient (measure of carry) with against without player' variant="teal" />
 
-                  <StatsCard title="Gini Coefficient - Damage" value={playerData!.gold_gini_coefficient.gini_with_player.toFixed(2)} delta={playerData!.gold_gini_coefficient.gini_with_player - playerData!.gold_gini_coefficient.gini_without_player} average={playerData!.gold_gini_coefficient.gini_without_player.toFixed(2)} footer='Gini Coefficient (measure of carry) with against without player' variant="light" />
+                  <StatsCard title="Gini Coefficient - Gold" value={playerData!.gold_gini_coefficient.gini_with_player.toFixed(2)} delta={playerData!.gold_gini_coefficient.gini_with_player - playerData!.gold_gini_coefficient.gini_without_player} average={playerData!.gold_gini_coefficient.gini_without_player.toFixed(2)} footer='Gini Coefficient (measure of carry) with against without player' variant="light" />
 
                   <StatsCard title="Kill Participation Rate" value={teamData!.kill_participation_rate_assists_vs_kills.player_team_kill_participation_rate.toFixed(1)} delta={teamData!.kill_participation_rate_assists_vs_kills.player_team_kill_participation_rate - teamData!.kill_participation_rate_assists_vs_kills.player_team_kill_participation_rate} average={teamData!.kill_participation_rate_assists_vs_kills.player_team_kill_participation_rate.toFixed(1)} footer='Enemy Team Kill Participation Rate (a measure of assists to kill and team unity)' variant="blue" />
             </HorizontalScroller>
@@ -292,10 +293,10 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
               ))}
             </div>
             <div className='sticky top-0 h-screen grid place-content-center'>
-              <h1 className='text-xl md:text-4xl pl-16 font-bold text-right tracking-tight leading-[120%]'>
+              <h1 className='text-xl md:text-4xl pl-24 md:pl-16 font-bold text-right tracking-tight leading-[120%]'>
                 Champions that your team banned
               </h1>
-              <h1 className='text-xl md:text-4xl pl-16 font-medium text-right tracking-tight leading-[120%]'>
+              <h1 className='text-md md:text-4xl pl-24 md:pl-16 font-medium text-right tracking-tight leading-[120%]'>
                 And finally, these were the champions your team banned for the highest number of games. 🥹
               </h1>
             </div>
@@ -307,7 +308,7 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
                 <div className='absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-size-[54px_54px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]'></div>
                 <Image src="/octocat.svg" maxWidth={120} maxHeight={120} alt="Fork us on Github" className='w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 mb-20' style={{ transform: 'translateX(-50%)', marginLeft: '50%' }}></Image>
                     <TextAnimation
-                    text={sharedReport ? "❤️ for Scrolling. Now to view your poroscope!" : "❤️ for Scrolling. Share your Poroscope -or- Check the source on Github 👇."}
+                    text={sharedReport ? "❤️ for Scrolling. Now to view your poroscope!" : "❤️ for Scrolling. Share your Poroscope -or- Check the source on Github 👇"}
                     variants={{
                         hidden: { filter: 'blur(10px)', opacity: 0, y: 20 },
                         visible: {

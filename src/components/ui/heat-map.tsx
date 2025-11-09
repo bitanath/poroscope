@@ -82,7 +82,7 @@ const Heatmap = React.forwardRef<HTMLTableElement, HeatmapProps>(
       >
         {showMonthLabels && (
           <thead>
-            <tr className="text-[12px]">
+            <tr className="text-[6px] md:text-[12px]">
               <td className="pb-2"></td>
               {monthLabels.map((month, i) => (
                 <td key={month} colSpan={monthSpans[i]}>
@@ -96,7 +96,7 @@ const Heatmap = React.forwardRef<HTMLTableElement, HeatmapProps>(
           {calendar.map((week: any[], i: number) => (
             <tr key={i}>
               {showDayLabels && (
-                <td className="pr-2 text-[12px]">
+                <td className="pr-2 text-[6px] md:text-[12px]">
                   {dayLabels[i]}
                 </td>
               )}
@@ -108,7 +108,7 @@ const Heatmap = React.forwardRef<HTMLTableElement, HeatmapProps>(
                       open={!!hoveredData && hoveredData.date === day.date} asChild
                     >
                       <div
-                        className="w-3 h-3 cursor-pointer rounded-[2px] border-none!"
+                        className="w-1.5 h-1.5 md:w-3 md:h-3 cursor-pointer rounded-[2px] border-none!"
                         style={{ backgroundColor: getColor(colors, max, day.value) }}
                         data-date={day.date}
                         data-value={day.value}
