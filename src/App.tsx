@@ -130,10 +130,10 @@ export default function App() {
         {({ signOut, user }) => (
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Home signOut={signOut!} />} />
-              <Route path="/home" element={<Home signOut={signOut!} />} />
-              <Route path="/dashboard" element={<Dashboard signOut={signOut!} user={user!} />} />
-              <Route path="/ssr" element={<Home signOut={signOut!} />} />
+              <Route path="/" element={<Home signOut={signOut!} user={user!}/>} />
+              <Route path="/home" element={<Home signOut={signOut!} user={user!}/>} />
+              <Route path="/dashboard" element={<Dashboard signOut={signOut!}/>} />
+              <Route path="/ssr" element={<Home signOut={signOut!} user={user!}/>} />
             </Routes>
           </BrowserRouter>
         )}

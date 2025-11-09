@@ -3,16 +3,20 @@ import { ReactLenis,useLenis } from '@studio-freight/react-lenis';
 import { useRef, useState } from 'react';
 import { LightBoard } from '../ui/lightboard';
 
-import Background from './Background';
-import { Dock } from './Dock';
+import Background from '../sections/Background';
+import { Dock } from '../sections/Dock';
 
-import { Card } from './Champion';
+import { Card } from '../sections/Champion';
 import { Image } from '@aws-amplify/ui-react';
 import TextAnimation from '@/components/ui/scroll-text';
-import HorizontalScroller from './Horizontal';
+import HorizontalScroller from '../sections/Horizontal';
+
+interface SummaryProps {
+  signOut: () => void;
+}
 
 
-export default function Sticky({signOut}:{signOut:()=>void}): JSX.Element {
+export default function Summary({signOut}:SummaryProps): JSX.Element {
   const container = useRef(null);
   const [dockVisible,setDockVisible] = useState(false);
   const [activeCardIndex, setActiveCardIndex] = useState(0);

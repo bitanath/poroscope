@@ -1,12 +1,42 @@
 import { useEffect, useState } from 'react';
 import { fetchAuthSession } from 'aws-amplify/auth';
+import { AccountSettings } from '@aws-amplify/ui-react';
+ import { useNavigate,useParams } from "react-router-dom";
+ import { BentoGrid, BentoGridItem } from "../components/ui/bento-grid";
+ import {
+   IconUserCheck,
+   IconLogout,
+   IconHome,
+   IconPower,
+   IconTrash
+ } from "@tabler/icons-react";
+import { VStack } from '@/components/sections/Stacks';
 
 interface DashboardProps {
   signOut: () => void;
-  user: any;
 }
 
-export default function Dashboard({ signOut, user }: DashboardProps) {
+
+export function BentoGridPreferences({items}:{items:Array<any>;}) {
+  return (
+    <BentoGrid className="max-w-6xl mx-auto md:auto-rows-[22rem]">
+      {items.map((item, i) => (
+        <BentoGridItem
+          key={i}
+          title={item.title}
+          description={item.description}
+          header={item.header}
+          className={item.className}
+          icon={item.icon}
+        />
+      ))}
+    </BentoGrid>
+  );
+}
+
+export default function Dashboard({ signOut }: DashboardProps) {
+  const navigate = useNavigate()
+  const {rewind} = useParams()
   const [userAttributes, setUserAttributes] = useState<any>({});
 
   useEffect(() => {
@@ -26,18 +56,66 @@ export default function Dashboard({ signOut, user }: DashboardProps) {
     };
     getAttributes();
   }, []);
+  const handleBackHome = () =>{
+    navigate("/home")
+  }
 
-  return (
-    <div>
-      <h1>Dashboard</h1>
-      <div>
-        <h2>User Information</h2>
-        <p><strong>User:</strong> {user.attributes?.email}</p>
+  const handleDeletion = ()=>{
+    navigate("/")
+  }
+  const handlePassword = ()=>{
+    navigate("/")
+  }
+
+  const items = [
+    {
+      title: "Account Details",
+      description: "This is all the information we have on you.",
+      header: <div>
+        <h2 className='text-lg font-bold text-gray-600'>Summoner Information</h2>
+        <p><strong>Rewind:</strong>{rewind}</p>
         <p><strong>Email:</strong> {userAttributes.email}</p>
         <p><strong>Riot ID:</strong> {userAttributes.riotId}</p>
         <p><strong>Region:</strong> {userAttributes.region}</p>
-      </div>
-      <button onClick={signOut}>Sign Out</button>
-    </div>
+      </div>,
+      className: "md:col-span-2",
+      icon: <IconUserCheck className="h-4 w-4 text-neutral-500" />,
+    },
+    {
+      title: "Delete Account",
+      description: "Warning! No takesies backsies.",
+      header: <VStack alignItems={"center"} justifyContent={"center"} height={280}>
+          <AccountSettings.DeleteUser onSuccess={handleDeletion} />
+        </VStack>,
+      className: "md:col-span-1",
+      icon: <IconTrash className="h-4 w-4 text-neutral-500" />,
+    },
+    {
+      title: "Sign Out",
+      description: "Sign out of Poroscope or just go back Home.",
+      header: <VStack alignItems={"center"} justifyContent={"center"} height={280}>
+        <button onClick={signOut} className="flex items-center gap-2 px-4 py-2">
+          <IconLogout size={16} />
+          Sign Out
+        </button>
+        <button onClick={handleBackHome} className="flex items-center gap-2 px-4 py-2">
+          <IconHome size={16} />
+          Back Home
+        </button>
+      </VStack>,
+      className: "md:col-span-1",
+      icon: <IconPower className="h-4 w-4 text-neutral-500" />,
+    },
+    {
+      header: <div className='max-h-[520px]!'>
+          <AccountSettings.ChangePassword onSuccess={handlePassword}/>
+        </div>,
+      className: "md:col-span-2",
+    },
+  ]
+
+  return (
+    <BentoGridPreferences items={items}></BentoGridPreferences>
+
   );
 }
