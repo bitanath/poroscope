@@ -95,8 +95,8 @@ def get_all_match_details(match_ids):
 
 def handler(event, context):
     try:
-        puuid = event.get('puuid')
-        puuid_set = event.get('puuid_set')
+        puuid = event['arguments'].get('puuid')
+        puuid_set = event['arguments'].get('puuid_set')
         if not puuid and not puuid_set:
             return {
                 'statusCode': 400,

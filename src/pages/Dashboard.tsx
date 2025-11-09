@@ -11,6 +11,7 @@ import { AccountSettings } from '@aws-amplify/ui-react';
    IconTrash
  } from "@tabler/icons-react";
 import { VStack } from '@/components/sections/Stacks';
+import Background from '@/components/sections/Background';
 
 interface DashboardProps {
   signOut: () => void;
@@ -115,7 +116,9 @@ export default function Dashboard({ signOut }: DashboardProps) {
   ]
 
   return (
-    <BentoGridPreferences items={items}></BentoGridPreferences>
-
+    <>
+      <Background></Background>
+      <BentoGridPreferences items={items}></BentoGridPreferences>
+    </>
   );
 }

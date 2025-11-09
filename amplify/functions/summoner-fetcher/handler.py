@@ -43,11 +43,11 @@ def fetch_summoner(fullName):
 
 def handler(event, context):
     try:
-        fullName = event.get('fullName')
+        fullName = event['arguments'].get('fullName')
         if not fullName:
             return {
                 'statusCode': 400,
-                'body': json.dumps({'error': 'puuid is required'})
+                'body': json.dumps({'error': 'fullName is required'})
             }
         summoner_dict = fetch_summoner(fullName)
         return {

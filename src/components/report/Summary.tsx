@@ -13,14 +13,16 @@ import HorizontalScroller from '../sections/Horizontal';
 
 interface SummaryProps {
   signOut: () => void;
+  profileDetails?: Record<string,any>|null
 }
 
 
-export default function Summary({signOut}:SummaryProps): JSX.Element {
+export default function Summary({signOut,profileDetails}:SummaryProps): JSX.Element {
   const container = useRef(null);
   const [dockVisible,setDockVisible] = useState(false);
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const [kda,_] = useState({kills:1000,deaths:100,assists:10})
+  
 
   useLenis(lenis=>{
     setDockVisible(lenis.progress > 0.1)
@@ -41,7 +43,7 @@ export default function Summary({signOut}:SummaryProps): JSX.Element {
                 <div className="flex justify-center">
                   <div className="w-32 h-32 md:w-24 md:h-24 lg:w-20 lg:h-20" style={{clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)'}}>
                     <Image 
-                    src='https://ddragon.leagueoflegends.com/cdn/15.22.1/img/profileicon/6923.png' 
+                    src={profileDetails?.profile_icon_url}
                     alt='Profile Image'
                     className="w-full h-full object-cover"
                     />

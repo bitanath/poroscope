@@ -4,7 +4,7 @@ import boto3
 import logging
 import requests
 
-from agents import analyse_data
+from agents import fetch_insights
 from concurrent.futures import ThreadPoolExecutor,as_completed
 
 logger = logging.getLogger()
@@ -42,7 +42,7 @@ def handler(event, context):
     os.environ['AWS_BEARER_TOKEN_BEDROCK'] = get_secret('AWS_BEARER_TOKEN_BEDROCK')
     
     try:
-        name = event.get('name')
+        name = event['arguments'].get('name')
         [game_name,tag_line] = name.split("#")
 
         puuid_set = get_puuid_set(game_name,tag_line)
@@ -65,12 +65,11 @@ def handler(event, context):
                 'body': json.dumps({'error': f'Unable to get matches for {name}'})
             }
         logger.info("Sending message to agent")
-        message = analyse_data(body)
-        logger.info("Got message from agent")
+        message = fetch_insights(body)
+        logger.info("Got insights from agent",message)
         return {
             'statusCode': 200,
-            'message': message,
-            'body': json.dumps(body)
+            'body': json.dumps(message)
         }
         
     except Exception as e:
