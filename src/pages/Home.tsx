@@ -20,15 +20,23 @@ const fetchUser = async ()=>{
     return {riotId,region,email}
 }
 
-const fetchProfilePic = async (fullName:string)=>{
+const fetchProfilePic = async (fullName:string,region:string)=>{
   const client = generateClient<Schema>()
   const profile = await client.queries.summonerFetcher({
-      fullName: fullName
+      fullName: fullName,
+      region: region
   })
   return profile
 }
 
-
+const fetchGameData = async (fullName:string,region:string) =>{
+  const client = generateClient<Schema>()
+  const data = await client.queries.orchestrator({
+    name: fullName,
+    region: region
+  })
+  return data
+}
 
 interface HomeProps {
   signOut: () => void;
@@ -43,18 +51,22 @@ export default function Home({ signOut }: HomeProps) {
   useEffect(()=>{
   const getData = async () => {
       try{
-        const {riotId} = await fetchUser()
+        const {riotId, region} = await fetchUser()
         console.log("Got riot id",riotId)
         if(!riotId){
           console.log("RIOT ID absent")
+          setError(true)
           return
         }
-        const profile = await fetchProfilePic(riotId)
+        const profile = await fetchProfilePic(riotId,region!.toUpperCase())
         console.log("Got profile",profile)
         const profileData = JSON.parse(profile.data?.toString()||"{}")
         const profileDetails = JSON.parse(profileData.body.toString()||"{}")
         setProfile(profileDetails)
-        console.log(profileDetails)
+        console.log(region,riotId)
+        const response = await fetchGameData("MadSkilzz#NA1",region!.toUpperCase())
+        const gameData = JSON.parse(response.data?.toString()||"{}")
+        console.log("Got game data",gameData)
       }catch(e){
         setError(true)
         console.log(e)

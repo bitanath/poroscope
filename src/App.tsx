@@ -1,6 +1,7 @@
 import Background from './components/sections/Background';
-import Home from './pages/Home';
+import Generated from './pages/Generated';
 import Dashboard from './pages/Dashboard';
+import Home from './pages/Home';
 
 import { generateClient } from 'aws-amplify/api';
 import type {Schema} from "amplify/data/resource";
@@ -23,7 +24,7 @@ export default function App() {
         })
         if (!result || !result.data){
           console.log(result)
-          throw new Error("Unable to check madar id:"+result.toString())
+          throw new Error("Unable to check for id:"+result.toString())
         }
         const returned = result.data
         let data
@@ -47,6 +48,10 @@ export default function App() {
 
   return (
     <>
+    <BrowserRouter>
+    <Routes>
+    <Route path="/generated/:id" element={<Generated />} />
+    <Route path="/*" element={
       <Authenticator
         initialState="signIn"
         components={{
@@ -60,14 +65,6 @@ export default function App() {
               return (
                 <>
                   <Authenticator.SignUp.FormFields />
-                  <TextField
-                    errorMessage={validationErrors.riotId as string}
-                    hasError={!!validationErrors.riotId}
-                    name="preferred_username"
-                    label="Riot User Id (xyz#ABC)"
-                    isRequired={true}
-                    placeholder="Enter your Riot Game Name with Tag (e.g., MadSkilzz#NA1)"
-                  />
                   <SelectField
                     errorMessage={validationErrors.region as string}
                     hasError={!!validationErrors.region}
@@ -92,6 +89,14 @@ export default function App() {
                     <option value="TW2">TW2</option>
                     <option value="VN2">VN2</option>
                   </SelectField>
+                  <TextField
+                    errorMessage={validationErrors.riotId as string}
+                    hasError={!!validationErrors.riotId}
+                    name="preferred_username"
+                    label="Riot User Id (xyz#ABC)"
+                    isRequired={true}
+                    placeholder="Enter your Riot Game Name with Tag (e.g., MadSkilzz#NA1)"
+                  />
                 </>
               );
             },
@@ -113,7 +118,7 @@ export default function App() {
                 if(tag.length < 3) throw 'Invalid tag line (format Game Name#TagLine)'
                 const validated = await validateRiotId(name, tag)
                 if (!validated) {
-                  errors.riotId = "Invalid Riot Id. Please check you've played at least 1 game."
+                  errors.riotId = "Invalid Riot Id. Please check your region and ensure you've played 1 game at least."
                 }
               } catch (e: any) {
                 errors.riotId = `${e.toString()}`
@@ -128,16 +133,17 @@ export default function App() {
           }
         }}>
         {({ signOut, user }) => (
-          <BrowserRouter>
             <Routes>
               <Route path="/" element={<Home signOut={signOut!} user={user!}/>} />
               <Route path="/home" element={<Home signOut={signOut!} user={user!}/>} />
               <Route path="/dashboard" element={<Dashboard signOut={signOut!}/>} />
               <Route path="/ssr" element={<Home signOut={signOut!} user={user!}/>} />
             </Routes>
-          </BrowserRouter>
         )}
-      </Authenticator>
+      </Authenticator>}>
+      </Route>
+      </Routes>
+      </BrowserRouter>
     </>
   );
 }

@@ -16,11 +16,32 @@ def get_secret(secret_name):
     response = client.get_parameter(Name=parameter_name, WithDecryption=True)
     return response['Parameter']['Value']
 
-def get_puuid_set(game_name,tag_line):
+def get_mega_region(region: str) -> str:
+    region_map = {
+        'BR1': 'americas',
+        'LA1': 'americas', 
+        'LA2': 'americas',
+        'NA1': 'americas',
+        'OC1': 'americas',
+        'EUN1': 'europe',
+        'EUW1': 'europe',
+        'ME1': 'europe',
+        'RU': 'europe',
+        'TR1': 'europe',
+        'JP1': 'asia',
+        'KR': 'asia',
+        'SG2': 'asia',
+        'TW2': 'asia',
+        'VN2': 'asia'
+    }
+    
+    return region_map[region]
+
+def get_puuid_set(game_name,tag_line,mega):
     api_keys = [get_secret('VALKYRIE_RIOT_API_KEY'), get_secret('DISABLOT_RIOT_API_KEY'), get_secret('RIGSTHULA_RIOT_API_KEY'), get_secret('RAGNAROK_RIOT_API_KEY'), get_secret('LIFTHRASIR_RIOT_API_KEY')]
     
     def fetch_puuid(api_key):
-        url = f"https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{game_name}/{tag_line}"   
+        url = f"https://{mega}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{game_name}/{tag_line}"   
         headers = {"X-Riot-Token": api_key}
         response = requests.get(url, headers=headers)
         puuid = response.json().get('puuid')
@@ -43,14 +64,17 @@ def handler(event, context):
     
     try:
         name = event['arguments'].get('name')
+        region = event['arguments'].get('region')  if event['arguments'].get('region') is not None else 'NA1'
+        mega = get_mega_region(region) if region is not None else 'americas'
+
         [game_name,tag_line] = name.split("#")
 
-        puuid_set = get_puuid_set(game_name,tag_line)
+        puuid_set = get_puuid_set(game_name,tag_line,mega)
         logger.info("Now invoking match data with puuids")
         match_response = lambda_client.invoke(
             FunctionName='amplify-d17o49q02hg78d-main-b-matchfetcher999CBB2E-gPkiyXEK4b8T',
             InvocationType='RequestResponse',
-            Payload=json.dumps({'arguments': {'puuid_set':puuid_set}})
+            Payload=json.dumps({'arguments': {'puuid_set':puuid_set,'region':region}})
         )
         logger.info("Got back a match response...")
         match_data = json.loads(match_response['Payload'].read())

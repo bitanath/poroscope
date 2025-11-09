@@ -8,7 +8,8 @@ const schema = a.schema({
     .query()
     .arguments({
       gameName: a.string(),
-      tagLine: a.string()
+      tagLine: a.string(),
+      region: a.string()
     })
     .returns(a.json())
     .authorization(allow => [allow.publicApiKey()])
@@ -17,7 +18,8 @@ const schema = a.schema({
   summonerFetcher: a
     .query()
     .arguments({
-      fullName: a.string()
+      fullName: a.string(),
+      region: a.string()
     })
     .returns(a.json())
     .authorization(allow => [allow.publicApiKey()])
@@ -26,7 +28,8 @@ const schema = a.schema({
   orchestrator: a
     .query()
     .arguments({
-      name: a.string()
+      name: a.string(),
+      region: a.string()
     })
     .returns(a.json())
     .authorization(allow => [allow.publicApiKey()])

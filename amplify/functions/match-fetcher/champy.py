@@ -8,12 +8,12 @@ def get_champions():
     champions = [{"id":c['key'],"name":c['id'],"story":c['blurb']} for c in champions['data'].values()]
     return champions
 
-def get_champion_masteries(api_key,puuid_valkyrie,champions):
+def get_champion_masteries(api_key,puuid_valkyrie,champions,region):
     
     headers = {
         "X-Riot-Token": api_key
     }
-    url = f"https://na1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid_valkyrie}/top?count=10"
+    url = f"https://{region.lower()}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid_valkyrie}/top?count=10"
     response = requests.get(url, headers=headers)
     
     top_champion_masteries = response.json()
