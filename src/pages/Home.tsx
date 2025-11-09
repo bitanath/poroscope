@@ -75,7 +75,7 @@ export default function Home({ signOut }: HomeProps) {
           console.log("Starting to fetch game data",riotId,region!.toUpperCase())
           const response = await fetchGameData(riotId!,region!.toUpperCase(),session)
           console.log(response)
-          const gameData = JSON.parse(response.data?.toString()||'{"error":"Fetched blank game data"}')
+          const gameData = JSON.parse(response.body?.toString()||'{"error":"Fetched blank game data"}')
           console.log("Got game data",gameData)
           // if(!gameData || gameData.statusCode!=200 || !gameData.body || JSON.parse(gameData.body).error) throw "Unable to fetch game data"
         }catch(e){

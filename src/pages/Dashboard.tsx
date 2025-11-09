@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { AccountSettings } from '@aws-amplify/ui-react';
- import { useNavigate,useParams } from "react-router-dom";
- import { BentoGrid, BentoGridItem } from "../components/ui/bento-grid";
- import {
-   IconUserCheck,
-   IconLogout,
-   IconHome,
-   IconPower,
-   IconTrash
- } from "@tabler/icons-react";
+import { useNavigate,useParams } from "react-router-dom";
+import { BentoGrid, BentoGridItem } from "../components/ui/bento-grid";
+import {
+  IconUserCheck,
+  IconLogout,
+  IconHome,
+  IconPower,
+  IconTrash
+} from "@tabler/icons-react";
+
 import { VStack } from '@/components/sections/Stacks';
 import Background from '@/components/sections/Background';
+import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 
 interface DashboardProps {
   signOut: () => void;
@@ -39,6 +41,7 @@ export default function Dashboard({ signOut }: DashboardProps) {
   const navigate = useNavigate()
   const {rewind} = useParams()
   const [userAttributes, setUserAttributes] = useState<any>({});
+  const [userSession, setUserSession] = useState<any>({});
 
   useEffect(() => {
     const getAttributes = async () => {
@@ -51,6 +54,7 @@ export default function Dashboard({ signOut }: DashboardProps) {
           riotId: token?.['preferred_username'],
           region: token?.['zoneinfo']
         });
+        setUserSession(session)
       } catch (error) {
         console.error('Error:', error);
       }
@@ -59,6 +63,25 @@ export default function Dashboard({ signOut }: DashboardProps) {
   }, []);
   const handleBackHome = () =>{
     navigate("/home")
+  }
+
+  const refreshCache = async (userAttributes:any,userSession:any)=>{
+    const {riotId,region} = userAttributes
+    const client = new LambdaClient({ region: 'us-east-1',credentials: userSession.credentials });
+  
+    const command = new InvokeCommand({
+      FunctionName: 'amplify-d17o49q02hg78d-main-b-orchestratorDDCE86FA-h6z54lCpyUFr', // Your function name
+      Payload: JSON.stringify({
+        arguments: {
+          name: riotId,
+          region: region
+        }
+      })
+    });
+  
+      const response = await client.send(command);
+      const result = JSON.parse(new TextDecoder().decode(response.Payload));
+      return result
   }
 
   const handleDeletion = ()=>{
@@ -87,6 +110,10 @@ export default function Dashboard({ signOut }: DashboardProps) {
       description: "Warning! No takesies backsies.",
       header: <VStack alignItems={"center"} justifyContent={"center"} height={280}>
           <AccountSettings.DeleteUser onSuccess={handleDeletion} />
+          <button onClick={()=>{refreshCache(userAttributes,userSession)}} className="flex items-center gap-2 px-4 py-2">
+            <IconTrash size={16} />
+            Delete Cache
+          </button>
         </VStack>,
       className: "md:col-span-1",
       icon: <IconTrash className="h-4 w-4 text-neutral-500" />,

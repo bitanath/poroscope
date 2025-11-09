@@ -19,6 +19,10 @@ export const orchestrator = defineFunction(
         new PolicyStatement({
           actions: ['lambda:InvokeFunction'],
           resources: ['arn:aws:lambda:*:*:function:amplify-*']
+        }),
+        new PolicyStatement({
+          actions: ['dynamodb:GetItem', 'dynamodb:PutItem', 'dynamodb:DeleteItem'],
+          resources: ['arn:aws:dynamodb:*:*:table/amplify-*']
         })
       ],
       handler: "handler.handler",

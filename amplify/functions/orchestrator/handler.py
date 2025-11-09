@@ -2,6 +2,7 @@ import os
 import json
 import boto3
 import logging
+import hashlib
 import requests
 
 from agents import fetch_insights
@@ -65,9 +66,38 @@ def handler(event, context):
     try:
         name = event['arguments'].get('name')
         region = event['arguments'].get('region')  if event['arguments'].get('region') is not None else 'NA1'
+        delete_cache = event['arguments'].get('delete', False)
         mega = get_mega_region(region) if region is not None else 'americas'
 
         [game_name,tag_line] = name.split("#")
+
+        dynamodb = boto3.resource('dynamodb')
+        table_name = 'CACHE_REPORTS'
+        cache_table = dynamodb.Table(table_name)
+            
+        cache_key = hashlib.md5(f"{name}#{region}".encode()).hexdigest()[:8]
+        
+        try:
+            response = cache_table.get_item(Key={'id': cache_key})
+            if 'Item' in response:
+                if delete_cache:
+                    try:
+                        cache_table.delete_item(Key={'id': cache_key})
+                        return {
+                            'statusCode': 200,
+                            'body': "deleted successfully"
+                        }
+                    except:
+                        return {
+                            'statusCode': 424,
+                            'body': "unable to delete due to internal error"
+                        }
+                return {
+                    'statusCode': 200,
+                    'body': response['Item']['data']
+                }
+        except:
+            pass
 
         puuid_set = get_puuid_set(game_name,tag_line,mega)
         logger.info(f"Now invoking match data with puuids {'<-->'.join(puuid_set)}")
@@ -91,6 +121,15 @@ def handler(event, context):
         logger.info("Sending message to agent")
         message = fetch_insights(body)
         logger.info("Got insights from agent")
+        try:
+            cache_table.put_item(
+                Item={
+                    'id': cache_key,
+                    'data': json.dumps(message)
+                }
+            )
+        except:
+            pass
         return {
             'statusCode': 200,
             'body': json.dumps(message)
