@@ -113,7 +113,7 @@ def handler(event, context):
                             'statusCode': 424,
                             'body': "unable make it public"
                         }
-                elif cacher is not None and not response['Item']['public']:
+                elif cacher is not None and not response['Item'].get('public', False):
                     return {
                         'statusCode': 401,
                         'body': "Not a public report"
@@ -128,6 +128,8 @@ def handler(event, context):
                             'statusCode': 404,
                             'body': "unable to find the cached report provided"
                         }
+            else:
+                logger.info("Not cached, fetch afresh")
         except Exception as e:
             logger.error(e)
         
