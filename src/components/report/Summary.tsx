@@ -44,6 +44,7 @@ export default function Summary({signOut,profileDetails}:SummaryProps): JSX.Elem
                   <div className="w-32 h-32 md:w-24 md:h-24 lg:w-20 lg:h-20" style={{clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)'}}>
                     <Image 
                     src={profileDetails?.profile_icon_url}
+                    hidden={!(profileDetails && profileDetails?.profile_icon_url)}
                     alt='Profile Image'
                     className="w-full h-full object-cover"
                     />
@@ -67,7 +68,7 @@ export default function Summary({signOut,profileDetails}:SummaryProps): JSX.Elem
                     },
                 }}
                 />
-              <h1 className='dock-trigger xl:text-xl text-2xl px-8 font-semibold text-center tracking-tight leading-[120%] mt-20'>MadSkilzz, This is your Rift Rewind 👇</h1>
+              <h1 className='dock-trigger xl:text-xl text-2xl px-8 font-semibold text-center tracking-tight leading-[120%] mt-20'>{profileDetails?.name}, This is your Rift Rewind 👇</h1>
             </div>
           </section>
           

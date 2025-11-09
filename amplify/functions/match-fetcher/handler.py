@@ -128,9 +128,9 @@ def handler(event, context):
             }
         elif not puuid:
             puuid_set = list(puuid_set)
-            puuid = puuid_set[0] #guaranteed to be Valkyrie
+            puuid = puuid_set[-1] #guaranteed to be Valkyrie -> Ragnarok
         
-        default_api_key = get_secret('VALKYRIE_RIOT_API_KEY')
+        default_api_key = get_secret('LIFTHRASIR_RIOT_API_KEY')
         headers = {
             "X-Riot-Token": default_api_key
         }

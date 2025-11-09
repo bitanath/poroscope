@@ -70,7 +70,7 @@ def handler(event, context):
         [game_name,tag_line] = name.split("#")
 
         puuid_set = get_puuid_set(game_name,tag_line,mega)
-        logger.info("Now invoking match data with puuids")
+        logger.info(f"Now invoking match data with puuids {'<-->'.join(puuid_set)}")
         match_response = lambda_client.invoke(
             FunctionName='amplify-d17o49q02hg78d-main-b-matchfetcher999CBB2E-gPkiyXEK4b8T',
             InvocationType='RequestResponse',
@@ -90,7 +90,7 @@ def handler(event, context):
             }
         logger.info("Sending message to agent")
         message = fetch_insights(body)
-        logger.info("Got insights from agent",message)
+        logger.info("Got insights from agent")
         return {
             'statusCode': 200,
             'body': json.dumps(message)

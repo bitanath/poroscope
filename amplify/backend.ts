@@ -5,6 +5,7 @@ import { validateRiotId } from './functions/validate-riot-id/resource';
 import { matchFetcher } from './functions/match-fetcher/resource';
 import { summonerFetcher } from './functions/summoner-fetcher/resource';
 import { orchestrator } from './functions/orchestrator/resource';
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
 export const backend = defineBackend({
   auth,
@@ -16,3 +17,9 @@ export const backend = defineBackend({
 });
 
 
+backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
+  new PolicyStatement({
+    actions: ['lambda:InvokeFunction'],
+    resources: [`arn:aws:lambda:*:*:function:amplify-*`]
+  })
+);

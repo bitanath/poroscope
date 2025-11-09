@@ -42,7 +42,7 @@ def fetch_summoner(fullName,region,mega):
     [game_name,tag_line] = fullName.split("#")
     url = f"https://{mega}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{game_name}/{tag_line}"
     response = requests.get(url, headers=headers)
-    if(response.status_code != 200): raise Exception(f"Unable to fetch riot id by {game_name} and #{tag_line}")
+    if(response.status_code != 200): raise Exception(f"Unable to fetch riot id by {game_name} and #{tag_line} for {mega} - {region}")
     player_dict = response.json()
     puuid = player_dict['puuid']
 
@@ -72,6 +72,7 @@ def handler(event, context):
                 'statusCode': 400,
                 'body': json.dumps({'error': 'fullName is required'})
             }
+        
         summoner_dict = fetch_summoner(fullName,region,mega)
         return {
             'statusCode': 200,
