@@ -1,14 +1,24 @@
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { fetchAuthSession } from 'aws-amplify/auth';
 
 export default function Generated(){
   const { id } = useParams();
   const [searchParams] = useSearchParams();
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
   
   useEffect(() => {
-    console.log('Share ID:', id);
+    const showCopyLink = async () => {
+      console.log('Share ID:', id);
+      const session = await fetchAuthSession()
+      if(session){
+        setShowModal(true)
+      }
+    }
+
+    showCopyLink()
+    
   }, [id, searchParams]);
 
   const copyToClipboard = () => {

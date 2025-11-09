@@ -68,8 +68,8 @@ def handler(event, context):
         region = event['arguments'].get('region')  if event['arguments'].get('region') is not None else 'NA1'
         delete_cache = event['arguments'].get('delete', False)
         make_public = event['arguments'].get('publicize', False)
-        mega = get_mega_region(region) if region is not None else 'americas'
         cacher = event['arguments'].get('cacheKey')
+        mega = get_mega_region(region) if region is not None else 'americas'
 
         [game_name,tag_line] = name.split("#")
 
@@ -141,8 +141,8 @@ def handler(event, context):
                     'data': json.dumps(message)
                 }
             )
-        except:
-            logger.info("Errored out while caching")
+        except Exception as e:
+            logger.info(f"Errored out while caching : {str(e)}")
             pass
         return {
             'statusCode': 200,
