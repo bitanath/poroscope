@@ -72,7 +72,7 @@ def handler(event, context):
         cacher = event['arguments'].get('cacheKey')
         mega = get_mega_region(region) if region is not None else 'americas'
 
-        [game_name,tag_line] = name.split("#")
+        [game_name,tag_line] = name.split("#") if name is not None else ["a","b"]
 
         dynamodb = boto3.resource('dynamodb')
         table_name = 'CACHE_REPORTS'
