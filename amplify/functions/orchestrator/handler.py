@@ -50,7 +50,7 @@ def handler(event, context):
         match_response = lambda_client.invoke(
             FunctionName='amplify-d17o49q02hg78d-main-b-matchfetcher999CBB2E-gPkiyXEK4b8T',
             InvocationType='RequestResponse',
-            Payload=json.dumps({'puuid_set': puuid_set})
+            Payload=json.dumps({'arguments': {'puuid_set':puuid_set}})
         )
         logger.info("Got back a match response...")
         match_data = json.loads(match_response['Payload'].read())
