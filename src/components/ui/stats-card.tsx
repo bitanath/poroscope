@@ -1,9 +1,6 @@
 import { Badge } from '@aws-amplify/ui-react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
-import { Formbar } from '../sections/Formbar';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
-import { CategoryBar } from '../sections/CategoryBar';
-import { ContributionMap } from './heat-map';
 
 interface StatsCardProps {
   title: string;

@@ -2,6 +2,7 @@ import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 import { validateRiotId } from "../functions/validate-riot-id/resource";
 import { summonerFetcher } from "../functions/summoner-fetcher/resource";
 import { orchestrator } from "../functions/orchestrator/resource";
+import { publicFetcher } from "../functions/public-fetcher/resource";
 
 const schema = a.schema({
   validateRiotId: a
@@ -22,7 +23,7 @@ const schema = a.schema({
       region: a.string()
     })
     .returns(a.json())
-    .authorization(allow => [allow.publicApiKey()])
+    .authorization(allow => [allow.authenticated()])
     .handler(a.handler.function(summonerFetcher)),
 
   orchestrator: a
@@ -35,8 +36,19 @@ const schema = a.schema({
       publicize: a.boolean()
     })
     .returns(a.json())
-    .authorization(allow => [allow.publicApiKey()])
+    .authorization(allow => [allow.authenticated()])
     .handler(a.handler.function(orchestrator)),
+
+  publicFetcher: a
+    .query()
+    .arguments({
+      cacheKey: a.string(),
+      publicize: a.boolean()
+    })
+    .returns(a.json())
+    .authorization(allow => [allow.publicApiKey()])
+    .handler(a.handler.function(publicFetcher)),
+
 })
 
 
