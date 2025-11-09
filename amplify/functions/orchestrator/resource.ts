@@ -22,7 +22,7 @@ export const orchestrator = defineFunction(
         }),
         new PolicyStatement({
           actions: ['dynamodb:GetItem', 'dynamodb:PutItem', 'dynamodb:DeleteItem'],
-          resources: ['arn:aws:dynamodb:*:*:table/amplify-*']
+          resources: ['arn:aws:dynamodb:*:*:table/CACHE_REPORTS']
         })
       ],
       handler: "handler.handler",
