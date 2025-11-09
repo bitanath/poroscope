@@ -51,15 +51,12 @@ const formatNumber = (num: number): string => {
 const BarLabels = ({ values, labels }: { values: number[]; labels?: string[] }) => {
   const sumValues = React.useMemo(() => sumNumericArray(values), [values])
   let prefixSum = 0
-  let sumConsecutiveHiddenLabels = 0
 
   return (
     <div
       className={cn(
-        // base
-        "relative mb-2 flex h-5 w-full text-sm font-medium",
-        // text color
-        "text-gray-300 dark:text-gray-100",
+        "relative mb-2 flex h-12 w-full text-sm font-medium",
+        "text-gray-500 dark:text-gray-100",
       )}
     >
       <div className="absolute bottom-0 left-0 flex items-center">
@@ -67,32 +64,22 @@ const BarLabels = ({ values, labels }: { values: number[]; labels?: string[] }) 
       </div>
       {values.map((widthPercentage, index) => {
         prefixSum += widthPercentage
-
-        const showLabel =
-          (widthPercentage >= 0.1 * sumValues ||
-            sumConsecutiveHiddenLabels >= 0.09 * sumValues) &&
-          sumValues - prefixSum >= 0.1 * sumValues &&
-          prefixSum >= 0.1 * sumValues &&
-          prefixSum < 0.9 * sumValues
-
-        sumConsecutiveHiddenLabels = showLabel
-          ? 0
-          : (sumConsecutiveHiddenLabels += widthPercentage)
-
         const widthPositionLeft = getPositionLeft(widthPercentage, sumValues)
-
-        // Don't show second label (index 0) or penultimate label (index values.length - 2)
-        const hideLabel = labels && (index === 0 || index === values.length - 2)
+        const isTop = index % 2 === 1
+        const showLabel = index < values.length - 2 // Force show all labels for testing
 
         return (
           <div
             key={`item-${index}`}
-            className="flex items-center justify-end pr-0.5"
+            className="flex items-end justify-end pr-0.5 relative h-full"
             style={{ width: `${widthPositionLeft}%` }}
           >
-            {showLabel && !hideLabel ? (
+            {showLabel ? (
               <span
-                className={cn("block translate-x-1/2 text-sm text-gray-300 tabular-nums")}
+                className={cn(
+                  "absolute translate-x-4/5 px-4 text-sm tabular-nums", // Changed to red for visibility
+                  isTop ? "top-7" : "-bottom-10"
+                )}
               >
                 {labels ? labels[index + 1] || formatNumber(prefixSum) : formatNumber(prefixSum)}
               </span>
@@ -106,6 +93,10 @@ const BarLabels = ({ values, labels }: { values: number[]; labels?: string[] }) 
     </div>
   )
 }
+
+
+
+
 
 interface CategoryBarProps extends React.HTMLAttributes<HTMLDivElement> {
   values: number[]

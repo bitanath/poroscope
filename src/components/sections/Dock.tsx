@@ -23,7 +23,7 @@ export function Dock({visible=true,signOut}:{visible:boolean;signOut:()=>void;})
       icon: (
         <IconShare className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
-      href: "/share",
+      href: "/generated/share",
     },
     {
       title: "Sign Out",

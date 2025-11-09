@@ -1,20 +1,61 @@
 import { useParams, useSearchParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import { fetchAuthSession } from 'aws-amplify/auth';
+import { useEffect, useState, useRef } from 'react';
+import { LambdaClient,InvokeCommand } from '@aws-sdk/client-lambda';
+
+import { ChampionData, ChampionMastery, ChartData, PlayerData, PlayerInsights, TeamData, TeamInsights, ToplineData, ToplineInsights } from "@/components/report/types";
 
 export default function Generated(){
   const { id } = useParams();
   const [searchParams] = useSearchParams();
+  const [hash,setHash] = useState("")
+
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const [dockVisible,setDockVisible] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const hasRun = useRef(false);
+  //TODO: all metrics and insights go here
+  const [topline, setTopline] = useState<ToplineData|null>(null)
+  const [topInsight, setTopInsight] = useState<ToplineInsights|null>(null)
+  const [chartData, setChartData] = useState<ChartData|null>(null)
+  const [playerData, setPlayerData] = useState<PlayerData|null>(null)
+  const [playerInsight,setPlayerInsight] = useState<PlayerInsights|null>(null)
+  const [championMastery,setChampionMastery] = useState<ChampionMastery|null>(null)
+  const [championData,setChampionData] = useState<ChampionData|null>(null)
+  const [teamInsight,setTeamInsight] = useState<TeamInsights|null>(null)
+  const [teamData,setTeamData] = useState<TeamData|null>(null)
+
+  const fetchGameData = async (cacheIdentifier: string, session: any) => {
+    const client = new LambdaClient({ region: 'us-east-1',credentials: session.credentials });
+    const command = new InvokeCommand({
+      FunctionName: 'amplify-d17o49q02hg78d-main-b-orchestratorDDCE86FA-h6z54lCpyUFr', // Your function name
+      Payload: JSON.stringify({
+        arguments: {
+          cacheKey: cacheIdentifier
+        }
+      })
+    });
+    
+    const response = await client.send(command);
+    const result = JSON.parse(new TextDecoder().decode(response.Payload));
+    
+    return result;
+  };
   
   useEffect(() => {
     const showCopyLink = async () => {
-      console.log('Share ID:', id);
       const session = await fetchAuthSession()
-      if(session){
+      if(session && id=="share"){
+        const token = session.tokens?.idToken?.payload;
+        const detail = `${token?.['preferred_username']}-${token?.['zoneinfo']}`
+        const hash = btoa(detail)
+        setHash(hash)
         setShowModal(true)
       }
+      console.log(session,id)
     }
 
     showCopyLink()
@@ -22,14 +63,13 @@ export default function Generated(){
   }, [id, searchParams]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href);
+    navigator.clipboard.writeText(window.location.href.replace("/share",`/${hash}`));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
   
   return (
     <div>
-      Shared content for {id}
       
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -38,7 +78,7 @@ export default function Generated(){
             <div className="flex gap-2 mb-4">
               <input 
                 type="text" 
-                value={window.location.href} 
+                value={window.location.href.replace("/share",`/${hash}`)} 
                 readOnly 
                 className="flex-1 p-2 border rounded bg-gray-50"
               />

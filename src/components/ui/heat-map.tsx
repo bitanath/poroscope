@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo,useState } from 'react';
 import { cn } from '@/lib/utils';
+import { Tooltip } from './tool-tip';
 
 export const getLastMonday = (start: Date) => {
   let diff = (start.getDay() + 6) % 7;
@@ -46,9 +47,10 @@ interface HeatmapProps {
   showMonthLabels?: boolean;
   colors?: string[];
   className?: string;
-  onClick?: (event: React.MouseEvent<HTMLTableCellElement>) => void;
-  onMouseOut?: (event: React.MouseEvent<HTMLTableCellElement>) => void;
-  onMouseOver?: (event: React.MouseEvent<HTMLTableCellElement>) => void;
+  tooltipLabel?: string;
+  onClick?: (event: React.MouseEvent<HTMLTableCellElement | HTMLDivElement>) => void;
+  onMouseOut?: (event: React.MouseEvent<HTMLTableCellElement | HTMLDivElement>) => void;
+  onMouseOver?: (event: React.MouseEvent<HTMLTableCellElement | HTMLDivElement>) => void;
 }
 
 const Heatmap = React.forwardRef<HTMLTableElement, HeatmapProps>(
@@ -57,14 +59,16 @@ const Heatmap = React.forwardRef<HTMLTableElement, HeatmapProps>(
     year = new Date().getFullYear(),
     showDayLabels = true,
     showMonthLabels = true,
-    colors = ["#f3f4f6", "#e9d5ff", "#c084fc", "#9333ea", "#581c87"],
+    colors = ["#fca5a5", "#fed7aa", "#fde68a", "#bef264", "#86efac"],
     className,
     onClick,
     onMouseOut,
     onMouseOver,
+    tooltipLabel = "games", 
     ...props
   }, ref) => {
     const { max, calendar } = useMemo(() => getCalendar(data, year), [data, year]);
+    const [hoveredData, setHoveredData] = useState<{date: string, value: string} | null>(null);
 
     const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     const monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -78,7 +82,7 @@ const Heatmap = React.forwardRef<HTMLTableElement, HeatmapProps>(
       >
         {showMonthLabels && (
           <thead>
-            <tr className="text-[8px]">
+            <tr className="text-[12px]">
               <td className="pb-2"></td>
               {monthLabels.map((month, i) => (
                 <td key={month} colSpan={monthSpans[i]}>
@@ -92,28 +96,40 @@ const Heatmap = React.forwardRef<HTMLTableElement, HeatmapProps>(
           {calendar.map((week: any[], i: number) => (
             <tr key={i}>
               {showDayLabels && (
-                <td className="pr-2 text-[8px]">
+                <td className="pr-2 text-[12px]">
                   {dayLabels[i]}
                 </td>
               )}
               {week.map((day, j) => (
                 day ? (
-                    <td key={j} className="p-0">
-                    <div
-                        className="w-2 h-2 cursor-pointer rounded-[2px]"
+                  <td key={j} className="p-0">
+                    <Tooltip 
+                      content={hoveredData ? `${hoveredData.date}: ${hoveredData.value} ${tooltipLabel}` : ""}
+                      open={!!hoveredData && hoveredData.date === day.date} asChild
+                    >
+                      <div
+                        className="w-3 h-3 cursor-pointer rounded-[2px] border-none!"
                         style={{ backgroundColor: getColor(colors, max, day.value) }}
                         data-date={day.date}
                         data-value={day.value}
                         onClick={onClick}
-                        onMouseOut={onMouseOut}
-                        onMouseOver={onMouseOver}
-                    />
-                    </td>
+                        onMouseOut={(e) => {
+                          setHoveredData(null);
+                          onMouseOut?.(e);
+                        }}
+                        onMouseOver={(e) => {
+                          const date = e.currentTarget.dataset.date;
+                          const value = e.currentTarget.dataset.value;
+                          setHoveredData({ date: date || "", value: value || "" });
+                          onMouseOver?.(e);
+                        }}
+                      />
+                    </Tooltip>
+                  </td>
                 ) : (
-                    <td key={j} />
+                  <td key={j} />
                 )
-                ))}
-
+              ))}
             </tr>
           ))}
         </tbody>
@@ -122,40 +138,17 @@ const Heatmap = React.forwardRef<HTMLTableElement, HeatmapProps>(
   }
 );
 
+
 Heatmap.displayName = "Heatmap";
 
-const generateRandomData = (year: number) => {
-  const data: { [key: string]: number } = {};
-  const start = new Date(year, 0, 1);
-  const end = new Date(year, 11, 31);
-  
-  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-    const date = d.toISOString().split('T')[0];
-    data[date] = Math.floor(Math.random() * 10); // Random value 0-9
-  }
-  
-  return data;
-};
 
-const randomContributions = generateRandomData(2025)
-
-export function ContributionMap({data=randomContributions}:{data?:{[key:string]:number}|undefined}) {
-  
+export function ContributionMap({data,label}:{data:{[key:string]:number};label?:string;}) {
   return (
     <div className="p-4">
       <Heatmap 
         data={data}
         year={2025}
-        onClick={(e) => {
-          const date = e.currentTarget.dataset.date;
-          const value = e.currentTarget.dataset.value;
-          console.log(`Clicked: ${date}, Value: ${value}`);
-        }}
-        onMouseOver={(e) => {
-          const date = e.currentTarget.dataset.date;
-          const value = e.currentTarget.dataset.value;
-          console.log(`Hover: ${date}, Value: ${value}`);
-        }}
+        tooltipLabel={label}
       />
     </div>
   );

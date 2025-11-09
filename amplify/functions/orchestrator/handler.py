@@ -1,6 +1,7 @@
 import os
 import json
 import boto3
+import base64
 import logging
 import hashlib
 import requests
@@ -76,7 +77,7 @@ def handler(event, context):
         dynamodb = boto3.resource('dynamodb')
         table_name = 'CACHE_REPORTS'
         cache_table = dynamodb.Table(table_name)
-        cache_key = hashlib.md5(f"{name}#{region}".encode()).hexdigest()[:8] if cacher is None else cacher
+        cache_key = base64.b64encode(f"{name}-{region}".encode()).decode() if cacher is None else cacher
         logger.info("Found cache table now checking cache_key "+cache_key)
         
         try:
@@ -104,13 +105,25 @@ def handler(event, context):
                         cache_table.put_item(Item=item)
                     except:
                         pass
+                elif cacher is not None and not response['Item']['public']:
+                    return {
+                        'statusCode': 401,
+                        'body': "Not a public report"
+                    }
+                else:
+                    return {
+                        'statusCode': 200,
+                        'body': response['Item']['data']
+                    }
+            elif cacher is not None:
                 return {
-                    'statusCode': 200,
-                    'body': response['Item']['data']
-                }
+                            'statusCode': 404,
+                            'body': "unable to find the cached report provided"
+                        }
         except:
             pass
-
+        
+        
         puuid_set = get_puuid_set(game_name,tag_line,mega)
         logger.info(f"Now invoking match data with puuids {'<-->'.join(puuid_set)}")
         match_response = lambda_client.invoke(

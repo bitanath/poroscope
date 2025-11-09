@@ -319,7 +319,7 @@ def hot_streak(matches, puuid_set):
             
         timestamp_ms = match['info']['gameStartTimestamp']
         dt = datetime.datetime.fromtimestamp(timestamp_ms / 1000)
-        formatted_time = dt.strftime("%d-%b")
+        formatted_time = dt.strftime("%d-%b %I%p")
         
         is_abort = (match['info']['gameDuration'] < 300 or match['info']['endOfGameResult'] != 'GameComplete')
         if is_abort:
@@ -361,7 +361,7 @@ def tilt_chart(matches, puuid_set):
             
         timestamp_ms = match['info']['gameStartTimestamp']
         dt = datetime.datetime.fromtimestamp(timestamp_ms / 1000)
-        formatted_time = dt.strftime("%d-%b")
+        formatted_time = dt.strftime("%d-%b %I%p")
         
         is_abort = (match['info']['gameDuration'] < 300 or match['info']['endOfGameResult'] != 'GameComplete')
         if is_abort:

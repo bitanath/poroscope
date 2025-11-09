@@ -111,7 +111,7 @@ export default function Dashboard({ signOut }: DashboardProps) {
       description: "Warning! No takesies backsies.",
       header: <VStack alignItems={"center"} justifyContent={"center"} height={280}>
           <AccountSettings.DeleteUser onSuccess={handleDeletion} />
-          <button onClick={()=>{refreshCache(userAttributes,userSession)}} className="flex items-center gap-2 px-4 py-2">
+          <button onClick={()=>{refreshCache(userAttributes,userSession)}} className="flex items-center gap-2 px-4 py-2 bg-orange-600/80!">
             <IconTrash size={16} />
             Delete Cache
           </button>

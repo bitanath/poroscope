@@ -59,23 +59,8 @@ const StatsCard: React.FC<StatsCardProps> = ({
           </span>
           <Badge className="bg-white/20 font-semibold text-lg sm:text-2xl flex items-center gap-1">
             {delta > 0 ? <ArrowUp /> : <ArrowDown />}&nbsp;
-            <span className='text-sm sm:text-xl'>{delta}%</span>
+            <span className='text-sm sm:text-xl'>{delta.toFixed(1)}</span>
           </Badge>
-          <br />
-          {variant == "purple" && <Formbar />}
-          {variant == "light" && <CategoryBar
-            values={[10, 10, 20, 60]}
-            marker={{ value: 47, tooltip: "Check", showAnimation: true }}
-            colors={["pink", "amber", "emerald", "fuchsia"]}
-            className="mx-auto max-w-screen w-[320px]"
-          />}
-          {variant == "teal" && <CategoryBar
-            values={[30, 70]}
-            labels={["CLASSIC","ARAM"]}
-            colors={["pink", "amber"]}
-            className="mx-auto max-w-screen w-[320px]"
-          />}
-          {variant == "blue" && <ContributionMap></ContributionMap>}
 
         </div>
         <div className="text-sm sm:text-xl text-white/80 border-t border-white/20 pt-3">

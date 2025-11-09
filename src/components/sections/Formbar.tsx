@@ -86,7 +86,7 @@ const Tracker = React.forwardRef<HTMLDivElement, TrackerProps>(
     return (
       <div
         ref={forwardedRef}
-        className={cn("group flex h-8 w-full items-center", className)}
+        className={cn("group flex h-8 w-full items-center gap-0.5", className)}
         {...props}
       >
         {data.map((props, index) => (
@@ -104,72 +104,11 @@ const Tracker = React.forwardRef<HTMLDivElement, TrackerProps>(
 
 Tracker.displayName = "Tracker"
 
-const data = [
-  { type: 'win', name: 'Victory vs Team Alpha' },
-  { type: 'loss', name: 'Defeat vs Team Beta' },
-  { type: 'win', name: 'Victory vs Team Gamma' },
-  { type: 'abort', name: 'Draw vs Team Delta' },
-  { type: 'win', name: 'Victory vs Team Echo' },
-  { type: 'loss', name: 'Defeat vs Team Foxtrot' },
-  { type: 'win', name: 'Victory vs Team Golf' },
-  { type: 'win', name: 'Victory vs Team Hotel' },
-  { type: 'loss', name: 'Defeat vs Team India' },
-  { type: 'abort', name: 'Draw vs Team Juliet' },
-  { type: 'win', name: 'Victory vs Team Kilo' },
-  { type: 'loss', name: 'Defeat vs Team Lima' },
-  { type: 'win', name: 'Victory vs Team Mike' },
-  { type: 'win', name: 'Victory vs Team November' },
-  { type: 'loss', name: 'Defeat vs Team Oscar' },
-  { type: 'abort', name: 'Draw vs Team Papa' },
-  { type: 'win', name: 'Victory vs Team Quebec' },
-  { type: 'loss', name: 'Defeat vs Team Romeo' },
-  { type: 'win', name: 'Victory vs Team Sierra' },
-  { type: 'win', name: 'Victory vs Team Tango' },
-  { type: 'loss', name: 'Defeat vs Team Uniform' },
-  { type: 'abort', name: 'Draw vs Team Victor' },
-  { type: 'win', name: 'Victory vs Team Whiskey' },
-  { type: 'loss', name: 'Defeat vs Team X-ray' },
-  { type: 'win', name: 'Victory vs Team Yankee' },
-  { type: 'win', name: 'Victory vs Team Zulu' },
-  { type: 'loss', name: 'Defeat vs Storm Eagles' },
-  { type: 'abort', name: 'Draw vs Fire Dragons' },
-  { type: 'win', name: 'Victory vs Ice Wolves' },
-  { type: 'loss', name: 'Defeat vs Thunder Hawks' },
-  { type: 'win', name: 'Victory vs Shadow Panthers' },
-  { type: 'win', name: 'Victory vs Lightning Bolts' },
-  { type: 'loss', name: 'Defeat vs Crimson Tigers' },
-  { type: 'abort', name: 'Draw vs Golden Lions' },
-  { type: 'win', name: 'Victory vs Silver Sharks' },
-  { type: 'loss', name: 'Defeat vs Dark Ravens' },
-  { type: 'win', name: 'Victory vs Bright Phoenix' },
-  { type: 'win', name: 'Victory vs Steel Rhinos' },
-  { type: 'loss', name: 'Defeat vs Wild Boars' },
-  { type: 'abort', name: 'Draw vs Swift Falcons' },
-  { type: 'win', name: 'Victory vs Mighty Bears' },
-  { type: 'loss', name: 'Defeat vs Fierce Cobras' },
-  { type: 'win', name: 'Victory vs Royal Stallions' },
-  { type: 'win', name: 'Victory vs Savage Leopards' },
-  { type: 'loss', name: 'Defeat vs Ancient Owls' },
-  { type: 'abort', name: 'Draw vs Mystic Foxes' },
-  { type: 'win', name: 'Victory vs Blazing Meteors' },
-  { type: 'loss', name: 'Defeat vs Frozen Glaciers' },
-  { type: 'win', name: 'Victory vs Roaring Tsunamis' },
-  { type: 'win', name: 'Victory vs Soaring Eagles' },
-  { type: 'loss', name: 'Defeat vs Crushing Avalanche' },
-  { type: 'abort', name: 'Draw vs Burning Inferno' },
-  { type: 'win', name: 'Victory vs Shining Stars' },
-  { type: 'loss', name: 'Defeat vs Raging Storms' },
-  { type: 'win', name: 'Victory vs Calm Oceans' },
-  { type: 'win', name: 'Victory vs Solid Rocks' },
-  { type: 'loss', name: 'Defeat vs Flying Comets' },
-  { type: 'abort', name: 'Draw vs Dancing Flames' },
-  { type: 'win', name: 'Victory vs Howling Winds' },
-  { type: 'loss', name: 'Defeat vs Falling Rain' },
-  { type: 'win', name: 'Victory vs Rising Sun' }
-] as const
+interface FormbarProps {
+  data: Array<{ type: 'win' | 'loss' | 'abort'; name: string }>;
+}
 
-
-export const Formbar = () => (
+export const Formbar = ({ data }: FormbarProps) => (
   <>
     <Tracker className="hidden w-full lg:flex" data={data.slice(0,60)} />
     <Tracker
@@ -179,3 +118,4 @@ export const Formbar = () => (
     <Tracker className="flex w-full sm:hidden" data={data.slice(0, 30)} />
   </>
 )
+
