@@ -23,7 +23,6 @@ export default function App() {
           tagLine: tagLine
         })
         if (!result || !result.data){
-          console.log(result)
           throw new Error("Unable to check for id:"+result.toString())
         }
         const returned = result.data
@@ -105,7 +104,6 @@ export default function App() {
         services={{
           async validateCustomSignUp(formData) {
             const errors: any = {};
-            console.log(formData)
             const riotId:string|undefined = formData['preferred_username']
             const region:string|undefined = formData['zoneinfo']
             if (!riotId) {

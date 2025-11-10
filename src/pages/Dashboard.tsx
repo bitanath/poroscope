@@ -49,7 +49,6 @@ export default function Dashboard({ signOut }: DashboardProps) {
     try {
         const session = await fetchAuthSession();
         const token = session.tokens?.idToken?.payload;
-        console.log(session,token)
         setUserAttributes({
           email: token?.['email'],
           riotId: token?.['preferred_username'],

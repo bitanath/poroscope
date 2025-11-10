@@ -78,16 +78,14 @@ def handler(event, context):
         table_name = 'CACHE_REPORTS'
         cache_table = dynamodb.Table(table_name)
         cache_key = base64.b64encode(f"{name}-{region}".encode()).decode() if cacher is None else cacher
-        logger.info("Found cache table now checking cache_key "+cache_key)
         
         try:
             response = cache_table.get_item(Key={'id': cache_key})
             if 'Item' in response:
-                logger.info("Cache item found, fetching from there")
                 if delete_cache:
                     try:
                         cache_table.delete_item(Key={'id': cache_key})
-                        logger.info("Deleted cache item")
+                        
                         return {
                             'statusCode': 200,
                             'body': "deleted successfully"
@@ -135,27 +133,24 @@ def handler(event, context):
         
         
         puuid_set = get_puuid_set(game_name,tag_line,mega)
-        logger.info(f"Now invoking match data with puuids {'<-->'.join(puuid_set)}")
         match_response = lambda_client.invoke(
             FunctionName='amplify-d17o49q02hg78d-main-b-matchfetcher999CBB2E-gPkiyXEK4b8T',
             InvocationType='RequestResponse',
             Payload=json.dumps({'arguments': {'puuid_set':puuid_set,'region':region}})
         )
-        logger.info("Got back a match response...")
+        
         match_data = json.loads(match_response['Payload'].read())
-        logger.info("Done with match-fetching... ")
+        
         body = json.loads(match_data['body'])
         status = match_data['statusCode']
         
-        logger.info("Called and got analysed data... now to analyse using agent")
+        
         if(status != 200):
             return {
                 'statusCode': status,
                 'body': json.dumps({'error': f'Unable to get matches for {name}'})
             }
-        logger.info("Sending message to agent")
         message = fetch_insights(body)
-        logger.info("Got insights from agent")
         try:
             logger.info("Putting item in cache "+cache_key)
             cache_table.put_item(

@@ -59,7 +59,6 @@ def fetch_page(page, puuid, headers, mega):
 def get_all_matches_played(puuid, headers, mega):
     all_matches = []
     page = 0
-    logger.info("Starting to get match ids")
     with ThreadPoolExecutor(max_workers=4) as executor:
         while True:
             futures = []
@@ -107,7 +106,6 @@ def fetch_match_detail(match_id, mega):
 def get_all_match_details(match_ids, mega):
     all_details = []
    
-    logger.info("Starting to get match details")
     with ThreadPoolExecutor(max_workers=8) as executor:
         futures = [executor.submit(fetch_match_detail, match_id, mega) for match_id in match_ids]
         all_details = [future.result() for future in futures if future.result()]

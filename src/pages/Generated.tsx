@@ -64,7 +64,6 @@ export default function Generated(){
           const response = await fetchGameData(farmHash!,publicize)
           const {body} = JSON.parse(response.data?.toString() ||'{"error":"Fetched blank game data"}')
           const gameData = JSON.parse(body)
-          console.log("Got result",gameData)
           if(!gameData || gameData.error) throw "Unable to fetch game data"
           setTopline(gameData.topline_data)
           setTopInsight(gameData.topline_insights)
@@ -76,7 +75,6 @@ export default function Generated(){
           setTeamData(gameData.team_data)
           setTeamInsight(gameData.team_insights)
 
-          console.log("Got session and id: ",session,id,farmHash)
           setLoading(false)
       }catch(e){
         setError(true)

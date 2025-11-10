@@ -79,7 +79,7 @@ export default function Home({ signOut }: HomeProps) {
           const {riotId, region, session} = await fetchUser()
           if(!riotId) throw "Riot ID absent from database"
           const profile = await fetchProfilePic(riotId,region!.toUpperCase())
-          console.log(riotId, region,profile)
+          
           const profileData = JSON.parse(profile.data?.toString()||"{}")
           const profileDetails = JSON.parse(profileData.body.toString()||"{}")
           if(!profileDetails || !profileDetails.profile_icon_url) throw "Unable to fetch profile"
@@ -87,7 +87,7 @@ export default function Home({ signOut }: HomeProps) {
           
           const response = await fetchGameData(riotId!,region!.toUpperCase(),session)
           const gameData = JSON.parse(response.body?.toString()||'{"error":"Fetched blank game data"}')
-          console.log("Got result",gameData)
+          
           if(!gameData || gameData.error) throw "Unable to fetch game data"
           setTopline(gameData.topline_data)
           setTopInsight(gameData.topline_insights)
