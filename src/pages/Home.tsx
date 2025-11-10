@@ -71,6 +71,7 @@ export default function Home({ signOut }: HomeProps) {
   const [teamInsight,setTeamInsight] = useState<TeamInsights|null>(null)
   const [teamData,setTeamData] = useState<TeamData|null>(null)
 
+  const sleep = (ms:number) => new Promise(r => setTimeout(r, ms));
   useEffect(()=>{
     if (hasRun.current) return;
     hasRun.current = true;
@@ -82,6 +83,7 @@ export default function Home({ signOut }: HomeProps) {
           
           const profileData = JSON.parse(profile.data?.toString()||"{}")
           const profileDetails = JSON.parse(profileData.body.toString()||"{}")
+          sleep(1)
           if(!profileDetails || !profileDetails.profile_icon_url) throw "Unable to fetch profile"
           setProfile(profileDetails)
           
