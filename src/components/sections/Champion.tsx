@@ -51,16 +51,15 @@ export const Card: React.FC<CardProps> = memo(({ name, stat, index, activeIndex,
     >
       <CometCard className="overflow-visible!">
         <div
-          className="flex w-80 cursor-pointer flex-col items-stretch rounded-2xl border-0 pt-2 bg-[radial-gradient(circle,#0891b2_0%,#ffffff_100%)]"
+          className="flex w-60 md:w-80 cursor-pointer flex-col items-stretch rounded-2xl border-0 pt-2 bg-[radial-gradient(circle,#0891b2_0%,#ffffff_100%)]"
           aria-label="View invite F7RA"
         >
           <div className="mx-2 flex-1 border border-gray-200 rounded-xl">
             <div className="relative mt-2 aspect-3/4 w-full">
               <img
                 loading="lazy"
-                className="absolute h-full w-[420px] max-w-[420px] transform -translate-x-18 z-150 -translate-y-2 object-cover"
+                className="absolute h-full md:w-[420px] md:max-w-[420px] w-[240px] max-w-[240px] md:transform -translate-x-6 md:-translate-x-18 z-150 -translate-y-10 md:-translate-y-2 object-cover"
                 alt={`${name} background`}
-                width={420}
                 src={`/${name}.png`}
                 style={{
                   opacity: 1,
@@ -71,8 +70,8 @@ export const Card: React.FC<CardProps> = memo(({ name, stat, index, activeIndex,
             </div>
           </div>
           <div className="mt-2 flex shrink-0 items-center justify-between p-4 font-mono text-black">
-            <div className="text-xs">{name}</div>
-            <div className="text-xs text-gray-800 opacity-50">{stat || 'MVP Killer'}</div>
+            <div className="text-[8px] md:text-xs">{name}</div>
+            <div className="text-[6px] md:text-xs text-gray-800 opacity-50">{stat || 'MVP Killer'}</div>
           </div>
         </div>
       </CometCard>

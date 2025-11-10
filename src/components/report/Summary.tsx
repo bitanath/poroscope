@@ -71,7 +71,7 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
                 as='p'
                 letterAnime={true}
                 text={`In 2025 you spent ${topline?.hours_played} hours of your year playing ${topline?.classic_games_stats.played} Summoner's Rift games and ${topline?.aram_games_stats.played} ARAM games ✨`}
-                classname='max-w-screen text-white 2xl:text-7xl text-6xl px-8 font-semibold text-center tracking-tight leading-[120%]'
+                classname='max-w-screen text-white md:text-7xl text-3xl px-8 font-semibold text-center tracking-tight leading-[120%]'
                 variants={{
                     hidden: { filter: 'blur(4px)', opacity: 0, y: 20 },
                     visible: {
@@ -105,7 +105,7 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
                         transition: { ease: 'linear' },
                         },
                     }}
-                    classname='xl:text-7xl text-6xl max-w-screen mx-auto font-medium capitalize p-16'
+                    classname='md:text-7xl text-3xl max-w-screen mx-auto font-medium capitalize p-16'
                   />
                 <div className="absolute bottom-0 left-0 right-0 max-w-full w-full bg-black lightboard">
                     <LightBoard rows={25} lightSize={3} gap={2} text={`Kills:${floor(topline?.kills_deaths_assists.kills)}  Deaths:${floor(topline?.kills_deaths_assists.deaths)}  Assists:${floor(topline?.kills_deaths_assists.assists)}`} font="default" updateInterval={200} colors={{ background: "#1a1a1a", textDim: "#00ffff", drawLine: "#0000ff", textBright: "#9e85bf", }} />
@@ -153,7 +153,7 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
                         transition: { ease: 'linear' },
                         },
                     }}
-                    classname='xl:text-5xl text-4xl max-w-xl mx-auto font-medium capitalize'
+                    classname='md:text-5xl text-2xl max-w-xl mx-auto font-medium capitalize'
                     />
                 
             </section>
@@ -178,11 +178,11 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
               ))}
             </div>
             <div className='sticky top-0 h-screen grid place-content-center'>
-              <h1 className='text-xl md:text-4xl pl-24 md:pl-16 font-bold text-right tracking-tight leading-[120%]'>
+              <h1 className='text-lg md:text-4xl pl-24 md:pl-16 font-bold text-right tracking-tight leading-[120%]'>
                 Your Champion Mastery
               </h1>
               <br/>
-              <h1 className='text-md md:text-4xl pl-24 md:pl-16 font-medium text-right tracking-tight leading-[120%]'>
+              <h1 className='text-md md:text-3xl pl-24 md:pl-16 font-medium text-right tracking-tight leading-[120%]'>
                 {championMastery?.insight_mastery} 👑
               </h1>
             </div>
@@ -204,7 +204,7 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
                         transition: { ease: 'linear' },
                         },
                     }}
-                    classname='xl:text-5xl text-4xl max-w-md mx-auto font-medium capitalize'
+                    classname='md:text-5xl text-2xl max-w-md mx-auto font-medium capitalize'
                     />
                 
             </section>
@@ -228,11 +228,11 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
               ))}
             </div>
             <div className='sticky top-0 h-screen grid place-content-center'>
-              <h1 className='text-xl md:text-4xl pl-24 md:pl-16 font-bold text-right tracking-tight leading-[120%]'>
+              <h1 className='text-lg md:text-4xl pl-24 md:pl-16 font-bold text-right tracking-tight leading-[120%]'>
                 Champions that were your Nemesis
               </h1>
               <br/>
-              <h1 className='text-md md:text-4xl pl-24 md:pl-16 font-medium text-right tracking-tight leading-[120%]'>
+              <h1 className='text-md md:text-3xl pl-24 md:pl-16 font-medium text-right tracking-tight leading-[120%]'>
                 These champions unalived you the most. Compared and normalized against your opponents and teammates. 💀
               </h1>
             </div>
@@ -252,7 +252,7 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
                         transition: { ease: 'linear' },
                         },
                     }}
-                    classname='xl:text-5xl text-4xl max-w-md mx-auto font-medium capitalize'
+                    classname='md:text-5xl text-2xl max-w-md mx-auto font-medium capitalize'
                     />
             </section>
             <div className='h-[200vh] bg-gray-300 text-black grid place-content-center'></div>
@@ -293,10 +293,10 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
               ))}
             </div>
             <div className='sticky top-0 h-screen grid place-content-center'>
-              <h1 className='text-xl md:text-4xl pl-24 md:pl-16 font-bold text-right tracking-tight leading-[120%]'>
+              <h1 className='text-lg md:text-4xl pl-24 md:pl-16 font-bold text-right tracking-tight leading-[120%]'>
                 Champions that your team banned
               </h1>
-              <h1 className='text-md md:text-4xl pl-24 md:pl-16 font-medium text-right tracking-tight leading-[120%]'>
+              <h1 className='text-md md:text-3xl pl-24 md:pl-16 font-medium text-right tracking-tight leading-[120%]'>
                 And finally, these were the champions your team banned for the highest number of games. 🥹
               </h1>
             </div>
@@ -318,7 +318,7 @@ export default function Summary({setDockVisible,sharedReport,profileDetails,topl
                         transition: { ease: 'linear' },
                         },
                     }}
-                    classname='xl:text-5xl text-4xl max-w-3/4 p-8 mx-auto font-medium capitalize'
+                    classname='md:text-5xl text-2xl max-w-3/4 p-8 mx-auto font-medium capitalize'
                     />
             </section>
             
